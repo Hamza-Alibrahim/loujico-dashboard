@@ -1,0 +1,343 @@
+{
+  "sideBar": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "customers": "Customers",
+    "employees": "Employees",
+    "projects": "Projects",
+    "invoices": "Invoices",
+    "products": "Products",
+    "logs": "Logs",
+    "settings": "Settings",
+    "logoAlt": "logo image"
+  },
+  "home": {
+    "dashboard": "Dashboard",
+    "activeCustomers": "Active Customers",
+    "activeProjects": "Active Projects",
+    "overdueInvoices": "Overdue Invoices",
+    "presentEmployees": "Present Employees",
+    "loadingDashboard": "Loading dashboard data...",
+    "dashboardError": "Failed to load dashboard data. Please try again.",
+    "error": "Error"
+  },
+  "employee": {
+    "title": "Employees",
+    "search": "employee",
+    "loading": "Loading data...",
+    "usingDemoData": "Demo data is being displayed for demonstration and testing purposes only",
+    "errors": {
+      "noToken": "No authentication token found",
+      "connectionFailed": "Could not connect to server. Demo data is being used."
+    }
+  },
+  "user": {
+    "title": "Users",
+    "search": "user"
+  },
+  "customer": {
+    "title": "Customers",
+    "search": "customer"
+  },
+  "project": {
+    "title": "Projects",
+    "search": "project"
+  },
+  "invoice": {
+    "title": "Invoices",
+    "search": "invoice"
+  },
+  "product": {
+    "title": "Products",
+    "search": "product"
+  },
+  "log": {
+    "title": "Logs",
+    "search": "Log"
+  },
+  "todoFile": {
+    "associatedFiles": "Associated Files",
+    "chooseFile": "Choose File :",
+    "noFileChosen": "No file chosen",
+    "descriptionPlaceholder": "Description",
+    "addButton": "Add"
+  },
+  "todoEmp": {
+    "associatedEmployees": "Associated Employees",
+    "chooseEmployee": "choose employee",
+    "rolePlaceholder": "role",
+    "addButton": "Add"
+  },
+  "popup": {
+    "add": "Add",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "selectPlaceholder": "Select {{field}}",
+    "selectedFile": "Selected file",
+    "validation": {
+      "required": "{field} is required",
+      "invalidEmail": "Invalid email format",
+      "invalidPhone": "Invalid phone number",
+      "invalidNumber": "Must enter a valid number",
+      "minValue": "Value must be at least {min}",
+      "maxValue": "Value must be at most {max}",
+      "invalidDate": "Invalid date",
+      "dateAfter": "Date must be after {date}",
+      "dateBefore": "Date must be before {date}",
+      "minLength": "Must contain at least {minLength} characters",
+      "maxLength": "Must contain at most {maxLength} characters",
+      "invalidFileType": "File type not allowed. Allowed: {accept}",
+      "fileTooLarge": "File size too large. Maximum: {maxSize}MB"
+    }
+  },
+  "fields": {
+    "common": {
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "lastVisit": "Last Visit",
+      "isDeleted": "Status",
+      "createdBy": "Created By",
+      "updatedBy": "Updated By"
+    },
+    "employee": {
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "age": "Age",
+      "address": "Address",
+      "phone": "Phone Number",
+      "email": "Email",
+      "position": "Position",
+      "serviceDuration": "Service Duration",
+      "salary": "Salary",
+      "description": "Description",
+      "profileImage": "Profile Image",
+      "isPresent": "Presence Status"
+    },
+    "client": {
+      "id": "ID",
+      "name": "Client Name",
+      "phone": "Phone Number",
+      "email": "Email",
+      "address": "Address",
+      "companyDescription": "Company Description",
+      "industry": "Industry Type",
+      "serviceProvided": "Service Provided",
+      "inquiry": "Inquiry Text",
+      "workDate": "Work Date"
+    },
+    "project": {
+      "id": "ID",
+      "title": "Project Title",
+      "description": "Project Description",
+      "clientId": "Associated Client",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Project Status",
+      "fileName": "File Name",
+      "filePath": "File Path",
+      "fileType": "File Type",
+      "uploadedAt": "Upload Date",
+      "uploadedBy": "Uploaded By"
+    },
+    "log": {
+      "id": "ID",
+      "actionType": "Action Type",
+      "actionDescription": "Action Description",
+      "targetTable": "Target Table",
+      "targetId": "Target log ID",
+      "userId": "User ID",
+      "timestamp": "Action Date & Time"
+    },
+    "invoice": {
+      "id": "Invoice Number",
+      "clientId": "Client ID",
+      "projectId": "Project ID",
+      "amount": "Amount",
+      "issueDate": "Issue Date",
+      "dueDate": "Due Date",
+      "status": "Status",
+      "lastViewed": "Last Viewed"
+    },
+    "relation": {
+      "id": "ID",
+      "projectId": "Project ID",
+      "employeeId": "Employee ID",
+      "roleOnProject": "Role on Project",
+      "joinedAt": "Join Date"
+    },
+    "user": {
+      "id": "ID",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "firstName": "First Name",
+      "lastName": "Last Name"
+    },
+    "product": {
+      "id": "ID",
+      "name": "Product Name",
+      "description": "Description",
+      "price": "Price",
+      "monthlySubscription": "Monthly Subscription",
+      "isActive": "Status"
+    }
+  },
+  "dashTable": {
+    "searchPlaceholder": "Search for",
+    "noData": "No Data",
+    "buttons": {
+      "add": "Add",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "status": {
+      "present": "Present",
+      "absent": "Absent",
+      "deleted": "Deleted",
+      "active": "Active"
+    },
+    "alt": {
+      "employeeImage": "Employee Image"
+    },
+    "rowsPerPage": "Rows per page",
+    "of": "of",
+    "errors": {
+      "addFailed": "Failed to add {item}",
+      "updateFailed": "Failed to update {item}"
+    }
+  },
+  "popupFields": {
+    "employee": {
+      "id": "ID",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "age": "Age",
+      "phone": "Phone Number",
+      "email": "Email",
+      "position": "Position",
+      "serviceDuration": "Service Duration",
+      "salary": "Salary",
+      "address": "Address",
+      "description": "Description",
+      "profileImage": "Profile Image",
+      "isPresent": "Presence Status"
+    },
+    "client": {
+      "id": "ID",
+      "name": "Client Name",
+      "phone": "Phone Number",
+      "email": "Email",
+      "industry": "Industry Type",
+      "address": "Address",
+      "companyDescription": "Company Description",
+      "serviceProvided": "Service Provided",
+      "serviceProvidedCompany": "Service Provided by Company",
+      "startDuration": "Work Duration",
+      "endDuration": "End Date"
+    },
+    "project": {
+      "id": "ID",
+      "title": "Project Title",
+      "description": "Project Description",
+      "clientId": "Associated Client",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "status": "Project Status",
+      "price": "Project Price",
+      "fileName": "File Name",
+      "filePath": "File Path",
+      "fileType": "File Type"
+    },
+    "log": {
+      "id": "ID",
+      "actionType": "Action Type",
+      "targetTable": "Target Table",
+      "targetId": "Target Record ID",
+      "userId": "User ID",
+      "actionDescription": "Action Description"
+    },
+    "product": {
+      "id": "ID",
+      "name": "Product Name",
+      "price": "Price",
+      "isActive": "Status",
+      "monthlySubscription": "Monthly Subscription",
+      "description": "Description"
+    },
+    "invoice": {
+      "id": "Invoice Number",
+      "clientId": "Client ID",
+      "projectId": "Project ID",
+      "amount": "Amount",
+      "issueDate": "Issue Date",
+      "dueDate": "Due Date",
+      "status": "Status"
+    },
+    "relation": {
+      "id": "ID",
+      "projectId": "Project ID",
+      "employeeId": "Employee ID",
+      "roleOnProject": "Role on Project",
+      "joinedAt": "Join Date"
+    },
+    "user": {
+      "id": "ID",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role"
+    },
+    "options": {
+      "position": {
+        "manager": "Manager",
+        "developer": "Developer",
+        "designer": "Designer",
+        "analyst": "Analyst"
+      },
+      "industry": {
+        "technology": "Technology",
+        "healthcare": "Healthcare",
+        "finance": "Finance",
+        "education": "Education"
+      },
+      "status": {
+        "planned": "Planned",
+        "inProgress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      },
+      "actionType": {
+        "create": "Create",
+        "update": "Update",
+        "delete": "Delete",
+        "view": "View"
+      },
+      "targetTable": {
+        "employees": "Employees",
+        "clients": "Clients",
+        "projects": "Projects",
+        "products": "Products"
+      },
+      "invoiceStatus": {
+        "draft": "Draft",
+        "sent": "Sent",
+        "paid": "Paid",
+        "overdue": "Overdue"
+      },
+      "role": {
+        "manager": "Manager",
+        "developer": "Developer",
+        "designer": "Designer",
+        "tester": "Tester"
+      },
+      "userRole": {
+        "admin": "System Administrator",
+        "user": "User",
+        "viewer": "Viewer"
+      }
+    },
+    "suffix": {
+      "years": "years"
+    }
+  }
+}

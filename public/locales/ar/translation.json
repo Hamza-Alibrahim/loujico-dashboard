@@ -1,0 +1,343 @@
+{
+  "sideBar": {
+    "dashboard": "لوحة التحكم",
+    "users": "المستخدمون",
+    "customers": "العملاء",
+    "employees": "الموظفون",
+    "projects": "المشاريع",
+    "invoices": "الفواتير",
+    "products": "المنتجات",
+    "logs": "السجلات",
+    "settings": "الإعدادات",
+    "logoAlt": "صورة الشعار"
+  },
+  "home": {
+    "dashboard": "لوحة التحكم",
+    "activeCustomers": "العملاء النشطين",
+    "activeProjects": "المشاريع النشطة",
+    "overdueInvoices": "الفواتير المتأخرة",
+    "presentEmployees": "الموظفين الحاليين",
+    "loadingDashboard": "جاري تحميل بيانات لوحة التحكم...",
+    "dashboardError": "فشل في تحميل بيانات لوحة التحكم. يرجى المحاولة مرة أخرى.",
+    "error": "خطأ"
+  },
+  "employee": {
+    "title": "الموظفون",
+    "search": "موظف",
+    "loading": "جاري تحميل البيانات...",
+    "usingDemoData": "يتم عرض بيانات تجريبية لأغرصة العرض والتجربة فقط",
+    "errors": {
+      "noToken": "لم يتم العثور على رمز المصادقة",
+      "connectionFailed": "تعذر الاتصال بالخادم. يتم استخدام بيانات تجريبية."
+    }
+  },
+  "user": {
+    "title": "المستخدمون",
+    "search": "مستخدم"
+  },
+  "customer": {
+    "title": "العملاء",
+    "search": "عميل"
+  },
+  "project": {
+    "title": "المشاريع",
+    "search": "مشروع"
+  },
+  "invoice": {
+    "title": "الفواتير",
+    "search": "فاتورة"
+  },
+  "product": {
+    "title": "المنتجات",
+    "search": "منتج"
+  },
+  "log": {
+    "title": "السجلات",
+    "search": "سجل"
+  },
+  "todoFile": {
+    "associatedFiles": "الملفات المرتبطة",
+    "chooseFile": "اختر ملف :",
+    "noFileChosen": "لم يتم اختيار ملف",
+    "descriptionPlaceholder": "الوصف",
+    "addButton": "إضافة"
+  },
+  "todoEmp": {
+    "associatedEmployees": "الموظفون المرتبطون",
+    "chooseEmployee": "اختر موظف",
+    "rolePlaceholder": "الدور",
+    "addButton": "إضافة"
+  },
+  "popup": {
+    "add": "إضافة",
+    "edit": "تعديل",
+    "cancel": "إلغاء",
+    "selectPlaceholder": "اختر {{field}}",
+    "selectedFile": "الملف المحدد",
+    "validation": {
+      "required": "{field} مطلوب",
+      "invalidEmail": "صيغة البريد الإلكتروني غير صحيحة",
+      "invalidPhone": "رقم الهاتف غير صحيح",
+      "invalidNumber": "يجب إدخال رقم صحيح",
+      "minValue": "القيمة يجب أن تكون {min} على الأقل",
+      "maxValue": "القيمة يجب أن تكون {max} على الأكثر",
+      "invalidDate": "تاريخ غير صحيح",
+      "dateAfter": "التاريخ يجب أن يكون بعد {date}",
+      "dateBefore": "التاريخ يجب أن يكون قبل {date}",
+      "minLength": "يجب أن يحتوي على {minLength} أحرف على الأقل",
+      "maxLength": "يجب أن يحتوي على {maxLength} أحرف على الأكثر",
+      "invalidFileType": "نوع الملف غير مسموح. المسموح: {accept}",
+      "fileTooLarge": "حجم الملف كبير جداً. الحد الأقصى: {maxSize} ميجابايت"
+    }
+  },
+  "fields": {
+    "common": {
+      "createdAt": "تاريخ الإنشاء",
+      "updatedAt": "تاريخ التحديث",
+      "lastVisit": "آخر زيارة",
+      "isDeleted": "حالة الحذف",
+      "createdBy": "تم الإنشاء بواسطة",
+      "updatedBy": "تم التحديث بواسطة"
+    },
+    "employee": {
+      "id": "المعرف",
+      "firstName": "الاسم الأول",
+      "lastName": "الاسم الأخير",
+      "age": "العمر",
+      "address": "العنوان",
+      "phone": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "position": "المنصب",
+      "serviceDuration": "مدة الخدمة",
+      "salary": "الراتب",
+      "description": "الوصف",
+      "profileImage": "الصورة الشخصية",
+      "isPresent": "حالة التواجد"
+    },
+    "client": {
+      "id": "المعرف",
+      "name": "اسم العميل",
+      "phone": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "address": "العنوان",
+      "companyDescription": "وصف الشركة",
+      "industry": "نوع الصناعة",
+      "serviceProvided": "الخدمة المقدمة",
+      "inquiry": "نص الاستفسار",
+      "workDate": "تاريخ العمل"
+    },
+    "project": {
+      "id": "المعرف",
+      "title": "عنوان المشروع",
+      "description": "وصف المشروع",
+      "clientId": "العميل المرتبط",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "status": "حالة المشروع",
+      "fileName": "اسم الملف",
+      "filePath": "مسار الملف",
+      "fileType": "نوع الملف",
+      "uploadedAt": "تاريخ الرفع",
+      "uploadedBy": "تم الرفع بواسطة"
+    },
+    "log": {
+      "id": "المعرف",
+      "actionType": "نوع الإجراء",
+      "actionDescription": "وصف الإجراء",
+      "targetTable": "الجدول المستهدف",
+      "targetId": "معرف السجل المستهدف",
+      "userId": "معرف المستخدم",
+      "timestamp": "تاريخ ووقت الإجراء"
+    },
+    "invoice": {
+      "id": "رقم الفاتورة",
+      "clientId": "معرف العميل",
+      "projectId": "معرف المشروع",
+      "amount": "المبلغ",
+      "issueDate": "تاريخ الإصدار",
+      "dueDate": "تاريخ الاستحقاق",
+      "status": "الحالة",
+      "lastViewed": "آخر زيارة"
+    },
+    "relation": {
+      "id": "المعرف",
+      "projectId": "معرف المشروع",
+      "employeeId": "معرف الموظف",
+      "roleOnProject": "الدور في المشروع",
+      "joinedAt": "تاريخ الانضمام"
+    },
+    "user": {
+      "id": "المعرف",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "role": "الدور",
+      "firstName": "الأسم الأول",
+      "lastName": "الأسم الأخير"
+    },
+    "product": {
+      "id": "المعرف",
+      "name": "اسم المنتج",
+      "description": "الوصف",
+      "price": "السعر",
+      "monthlySubscription": "الاشتراك الشهري",
+      "isActive": "الحالة"
+    }
+  },
+  "dashTable": {
+    "searchPlaceholder": "ابحث عن",
+    "noData": "لا يوجد بيانات",
+    "buttons": {
+      "add": "إضافة",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "status": {
+      "present": "حاضر",
+      "absent": "غائب",
+      "deleted": "محذوف",
+      "active": "نشط"
+    },
+    "alt": {
+      "employeeImage": "صورة الموظف"
+    },
+    "rowsPerPage": "عدد السطور في الصفحة",
+    "of": "من",
+    "errors": {
+      "addFailed": "فشل في إضافة {item}",
+      "updateFailed": "فشل في تعديل {item}"
+    }
+  },
+  "popupFields": {
+    "employee": {
+      "id": "المعرف",
+      "firstName": "الاسم الأول",
+      "lastName": "الاسم الأخير",
+      "age": "العمر",
+      "phone": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "position": "المنصب",
+      "serviceDuration": "مدة الخدمة",
+      "salary": "الراتب",
+      "address": "العنوان",
+      "description": "الوصف",
+      "profileImage": "الصورة الشخصية",
+      "isPresent": "حالة التواجد"
+    },
+    "client": {
+      "id": "المعرف",
+      "name": "اسم العميل",
+      "phone": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "industry": "نوع الصناعة",
+      "address": "العنوان",
+      "companyDescription": "وصف الشركة",
+      "serviceProvided": "الخدمة المقدمة",
+      "serviceProvidedCompany": "الخدمة المقدمة من قبل الشركة",
+      "startDuration": "مدة العمل",
+      "endDuration": "تاريخ الانتهاء"
+    },
+    "project": {
+      "id": "المعرف",
+      "title": "عنوان المشروع",
+      "description": "وصف المشروع",
+      "clientId": "العميل المرتبط",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "status": "حالة المشروع",
+      "price": "سعر المشروع",
+      "fileName": "اسم الملف",
+      "filePath": "مسار الملف",
+      "fileType": "نوع الملف"
+    },
+    "log": {
+      "id": "المعرف",
+      "actionType": "نوع الإجراء",
+      "targetTable": "الجدول المستهدف",
+      "targetId": "معرف السجل المستهدف",
+      "userId": "معرف المستخدم",
+      "actionDescription": "وصف الإجراء"
+    },
+    "product": {
+      "id": "المعرف",
+      "name": "اسم المنتج",
+      "price": "السعر",
+      "isActive": "الحالة",
+      "monthlySubscription": "الاشتراك الشهري",
+      "description": "الوصف"
+    },
+    "invoice": {
+      "id": "رقم الفاتورة",
+      "clientId": "معرف العميل",
+      "projectId": "معرف المشروع",
+      "amount": "المبلغ",
+      "issueDate": "تاريخ الإصدار",
+      "dueDate": "تاريخ الاستحقاق",
+      "status": "الحالة"
+    },
+    "relation": {
+      "id": "المعرف",
+      "projectId": "معرف المشروع",
+      "employeeId": "معرف الموظف",
+      "roleOnProject": "الدور في المشروع",
+      "joinedAt": "تاريخ الانضمام"
+    },
+    "user": {
+      "id": "المعرف",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "role": "الدور"
+    },
+    "options": {
+      "position": {
+        "manager": "مدير",
+        "developer": "مطور",
+        "designer": "مصمم",
+        "analyst": "محلل"
+      },
+      "industry": {
+        "technology": "تكنولوجيا",
+        "healthcare": "رعاية صحية",
+        "finance": "مالية",
+        "education": "تعليم"
+      },
+      "status": {
+        "planned": "مخطط",
+        "inProgress": "قيد التنفيذ",
+        "completed": "مكتمل",
+        "cancelled": "ملغي"
+      },
+      "actionType": {
+        "create": "إنشاء",
+        "update": "تحديث",
+        "delete": "حذف",
+        "view": "عرض"
+      },
+      "targetTable": {
+        "employees": "الموظفين",
+        "clients": "العملاء",
+        "projects": "المشاريع",
+        "products": "المنتجات"
+      },
+      "invoiceStatus": {
+        "draft": "مسودة",
+        "sent": "مرسلة",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة"
+      },
+      "role": {
+        "manager": "مدير",
+        "developer": "مطور",
+        "designer": "مصمم",
+        "tester": "مختبر"
+      },
+      "userRole": {
+        "admin": "مدير النظام",
+        "user": "مستخدم",
+        "viewer": "مشاهد"
+      }
+    },
+    "suffix": {
+      "years": "سنوات"
+    }
+  }
+}
