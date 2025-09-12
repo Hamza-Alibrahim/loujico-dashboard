@@ -9,21 +9,25 @@ const API_BASE_URL = "http://192.168.1.10:7176";
 
 const DashTable = ({
   title,
-  search,
+  searchPlaceHolder,
   url,
   loading,
   fields,
   data,
   popUpFields = [],
-  isrefresh,
   setRefresh,
+  total,
+  page,
+  count,
+  search,
+  setPage,
+  setCount,
+  setSearch,
 }) => {
   const {
     t,
     i18n: { language },
   } = useTranslation();
-  const [numberToShow, setNumberToShow] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
   const [checkedFields, setCheckedFields] = useState([]);
   const [openPopUp, setOpenPopUp] = useState(false);
   const [isAdd, setIsAdd] = useState(true);
@@ -33,42 +37,16 @@ const DashTable = ({
   const token = localStorage.getItem("authToken");
 
   // Calculate pagination values
-  const totalItems = data.length;
-  const totalPages = Math.ceil(totalItems / numberToShow);
-  const startIndex = (currentPage - 1) * numberToShow;
-  const endIndex = Math.min(startIndex + numberToShow, totalItems);
-  const currentData = data.slice(startIndex, endIndex);
+  const totalItems = total || data.length;
+  const totalPages = Math.ceil(totalItems / count);
+  const startIndex = (page - 1) * count;
+  const endIndex = Math.min(startIndex + count, totalItems);
+  const currentData = data.slice(0, count); // Use the data provided from parent
 
   // Reset to first page when items per page changes
   useEffect(() => {
-    setCurrentPage(1);
-  }, [numberToShow]);
-
-  // const getData = useCallback(
-  //   async (id) => {
-  //     setIsLoading(true);
-  //     setError(null);
-  //     try {
-  //       const response = await axios.get(
-  //         `${API_BASE_URL}/api${url}/GetById/${id}`,
-  //         {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //             "Content-Type": "application/json",
-  //           },
-  //         }
-  //       );
-  //       const res = response.data.data[search];
-  //       setInitialData(res);
-  //     } catch (err) {
-  //       console.error(t("dashTable.errors.fetchFailed", { item: search }), err);
-  //       setError(t("dashTable.errors.fetchFailed", { item: search }));
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   },
-  //   [url, search, token, t]
-  // );
+    setPage(1);
+  }, [count, setPage]);
 
   const handleAdd = async (body) => {
     setIsLoading(true);
@@ -86,7 +64,7 @@ const DashTable = ({
       return response.data;
     } catch (err) {
       console.error(t("dashTable.errors.addFailed", { item: search }), err);
-      setError(t("dashTable.errors.addFailed", { item: search }));
+      setError(t("dashTable.errors.addFailed", { item: searchPlaceHolder }));
       throw err;
     } finally {
       setIsLoading(false);
@@ -112,8 +90,11 @@ const DashTable = ({
       }
       return response.data;
     } catch (err) {
-      console.error(t("dashTable.errors.updateFailed", { item: search }), err);
-      setError(t("dashTable.errors.updateFailed", { item: search }));
+      console.error(
+        t("dashTable.errors.updateFailed", { item: searchPlaceHolder }),
+        err
+      );
+      setError(t("dashTable.errors.updateFailed", { item: searchPlaceHolder }));
       throw err;
     } finally {
       setIsLoading(false);
@@ -141,8 +122,11 @@ const DashTable = ({
       // Clear selection after deletion
       setCheckedFields([]);
     } catch (err) {
-      console.error(t("dashTable.errors.deleteFailed", { item: search }), err);
-      setError(t("dashTable.errors.deleteFailed", { item: search }));
+      console.error(
+        t("dashTable.errors.deleteFailed", { item: searchPlaceHolder }),
+        err
+      );
+      setError(t("dashTable.errors.deleteFailed", { item: searchPlaceHolder }));
       throw err;
     } finally {
       setIsLoading(false);
@@ -164,7 +148,7 @@ const DashTable = ({
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
+      setPage(newPage);
     }
   };
 
@@ -184,8 +168,12 @@ const DashTable = ({
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    setPage(1); // Reset to first page when search changes
+  };
+
   return (
-    //
     <div className="p-6 bg-gray-300 h-[calc(100%-80px)]">
       <div className="p-8 rounded-md bg-white">
         <h1 className="text-3xl font-bold text-[var(--main-color)]">{title}</h1>
@@ -199,9 +187,13 @@ const DashTable = ({
         <div className="flex justify-between max-lg:justify-center items-center flex-wrap gap-3 mt-8 mb-5">
           <input
             type="text"
-            placeholder={`${t("dashTable.searchPlaceholder")} ${search}`}
+            placeholder={`${t(
+              "dashTable.searchPlaceholder"
+            )} ${searchPlaceHolder}`}
             className="px-5 py-2 bg-gray-300 rounded-md w-96 transition-colors hover:bg-gray-200 focus-visible:outline-[var(--main-color)]"
             aria-label={t("dashTable.searchPlaceholder")}
+            value={search}
+            onChange={handleSearchChange}
           />
           <div className="flex flex-wrap gap-3 max-lg:justify-center">
             {popUpFields.length > 0 && (
@@ -236,8 +228,10 @@ const DashTable = ({
             <thead>
               <tr>
                 <th
-                  className={`px-3 h-12 bg-[var(--main-color-lighter)] text-[var(--main-color)] border-l border-white font-semibold ${
-                    language === "ar" ? "rounded-tr-md" : "rounded-tl-md"
+                  className={`h-12 bg-[var(--main-color-lighter)] text-[var(--main-color)] border-white font-semibold ${
+                    language === "ar"
+                      ? "rounded-tr-md border-l"
+                      : "rounded-tl-md border-r"
                   }`}
                   style={{ width: "50px", minWidth: "50px" }}
                 >
@@ -255,10 +249,10 @@ const DashTable = ({
                 {fields.map((field) => (
                   <th
                     key={field.name}
-                    className={`px-3 h-12 bg-[var(--main-color-lighter)] text-[var(--main-color)] border-l border-white font-semibold ${
+                    className={`h-12 bg-[var(--main-color-lighter)] text-[var(--main-color)]  border-white font-semibold ${
                       language === "ar"
-                        ? "last:rounded-tl-md"
-                        : "last:rounded-tr-md"
+                        ? "last:rounded-tl-md border-l last:border-0"
+                        : "last:rounded-tr-md border-r last:border-0"
                     }`}
                     style={{
                       width: `${field.width}px`,
@@ -271,64 +265,86 @@ const DashTable = ({
               </tr>
             </thead>
             <tbody>
-              {currentData.length > 0 ? (
-                currentData.map((dataItem, i) => (
-                  <tr
-                    key={dataItem.id}
-                    className="transition-colors hover:bg-gray-200"
-                  >
-                    <td className="p-2 border-b border-l border-white text-md">
-                      <input
-                        className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                        onChange={(e) =>
-                          handleCheckboxChange(dataItem.id, e.target.checked)
-                        }
-                        checked={checkedFields.includes(dataItem.id)}
-                        type="checkbox"
-                        aria-label={t("dashTable.selectItem")}
-                      />
-                    </td>
-                    {fields.map((field) => (
-                      <td
-                        key={`${dataItem.id}-${field.name}`}
-                        className={`p-2 border-b border-l border-white text-md`}
-                      >
-                        {field.name === "is_present" ? (
-                          dataItem[field.name] ? (
-                            t("dashTable.status.present")
-                          ) : (
-                            t("dashTable.status.absent")
-                          )
-                        ) : field.name === "is_deleted" ? (
-                          dataItem[field.name] ? (
-                            t("dashTable.status.deleted")
-                          ) : (
-                            t("dashTable.status.active")
-                          )
-                        ) : field.name === "profile_image" ? (
-                          <img
-                            src={dataItem[field.name]}
-                            alt={t("dashTable.alt.employeeImage")}
-                            className="w-10 h-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          dataItem[field.name]?.toString() || "-"
-                        )}
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : (
+              {loading ? (
                 <tr>
                   <td
                     colSpan={fields.length + 1}
-                    className={`p-4 ${
+                    className={`p-5 ${
                       language === "en" ? "text-left" : "text-right"
                     } text-gray-500`}
                   >
-                    {t("dashTable.noData")}
+                    <div className="flex space-x-2">
+                      <div className="w-4 h-4 rounded-xs bg-[var(--main-color)] animate-bounce [animation-delay:-0.3s]"></div>
+                      <div className="w-4 h-4 rounded-xs bg-[var(--main-color)] animate-bounce [animation-delay:-0.15s]"></div>
+                      <div className="w-4 h-4 rounded-xs bg-[var(--main-color)] animate-bounce"></div>
+                    </div>
                   </td>
                 </tr>
+              ) : (
+                <>
+                  {currentData.length > 0 ? (
+                    currentData.map((dataItem, i) => (
+                      <tr
+                        key={dataItem.id}
+                        className="transition-colors hover:bg-gray-200"
+                      >
+                        <td className="p-2 border-b border-l border-white text-md">
+                          <input
+                            className="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                            onChange={(e) =>
+                              handleCheckboxChange(
+                                dataItem.id,
+                                e.target.checked
+                              )
+                            }
+                            checked={checkedFields.includes(dataItem.id)}
+                            type="checkbox"
+                            aria-label={t("dashTable.selectItem")}
+                          />
+                        </td>
+                        {fields.map((field) => (
+                          <td
+                            key={`${dataItem.id}-${field.name}`}
+                            className={`p-2 border-b border-l border-white text-md`}
+                          >
+                            {field.name === "is_present" ? (
+                              dataItem[field.name] ? (
+                                t("dashTable.status.present")
+                              ) : (
+                                t("dashTable.status.absent")
+                              )
+                            ) : field.name === "is_deleted" ? (
+                              dataItem[field.name] ? (
+                                t("dashTable.status.deleted")
+                              ) : (
+                                t("dashTable.status.active")
+                              )
+                            ) : field.name === "profile_image" ? (
+                              <img
+                                src={dataItem[field.name]}
+                                alt={t("dashTable.alt.employeeImage")}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              dataItem[field.name]?.toString() || "-"
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={fields.length + 1}
+                        className={`p-4 ${
+                          language === "en" ? "text-left" : "text-right"
+                        } text-gray-500`}
+                      >
+                        {t("dashTable.noData")}
+                      </td>
+                    </tr>
+                  )}
+                </>
               )}
             </tbody>
           </table>
@@ -340,10 +356,10 @@ const DashTable = ({
               {t("dashTable.rowsPerPage")}:
             </span>
             <select
-              onChange={(e) => setNumberToShow(Number(e.target.value))}
+              onChange={(e) => setCount(Number(e.target.value))}
               className="outline-none cursor-pointer"
               disabled={isLoading}
-              value={numberToShow}
+              value={count}
             >
               <option value="10">10</option>
               <option value="20">20</option>
@@ -364,17 +380,17 @@ const DashTable = ({
             }`}
           >
             <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage >= totalPages || isLoading}
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page >= totalPages || isLoading}
               aria-label={t("dashTable.nextPage")}
               className="disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaAngleRight className="cursor-pointer" />
             </button>
-            <span>{currentPage}</span>
+            <span>{page}</span>
             <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage <= 1 || isLoading}
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page <= 1 || isLoading}
               aria-label={t("dashTable.previousPage")}
               className="disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -388,7 +404,7 @@ const DashTable = ({
         <PopUp
           isOpen={openPopUp}
           isAdd={isAdd}
-          title={search}
+          title={searchPlaceHolder}
           fields={popUpFields}
           onClose={() => setOpenPopUp(false)}
           initialData={!isAdd ? initialData : {}}
