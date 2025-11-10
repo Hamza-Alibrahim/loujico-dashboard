@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --main-color: #1F476F;
+  --main-color-darker: #132B43;
+  --main-color-lighter: #7899B2;
+  --sub-color: #B88647;
+  --sub-color-lighter: #E3C194;
+  --third-color: #8FA5B5;
+  --third-color-darker: #5A7081;
+  --text-color: #4a4a4a;
+  --text-color-dark: #2E2E2E;
+}
+
+input[type="checkbox"] {
+  accent-color: var(--main-color);
+  cursor: pointer;
+}
+
+/* For webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+.table-container::-webkit-scrollbar {
+  display: block !important;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--main-color);
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--main-color-lighter);
+}
+
+/* Buttons (arrows) */
+::-webkit-scrollbar-button {
+  background: var(--main-color);
+  border: 1px solid #ccc;
+  border-radius: 2px;
+}
+
+.dir-ltr {
+  direction: ltr;
+}
+
+.dir-rtl {
+  direction: rtl;
+}
+
+html {
+  direction: ltr;
+}
+
+.parent {
+  width: calc(100% - 260px);
+}
+
+tr:last-child td:first-child,
+tr:last-child td:last-child {
+  border-radius: 6px;
+}
