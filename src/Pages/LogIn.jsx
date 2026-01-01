@@ -6,6 +6,7 @@ import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 import { FaEye } from "react-icons/fa";
 import { FaEyeSlash } from "react-icons/fa6";
+import { jwtDecode } from "jwt-decode";
 
 const Login = () => {
   // 1. حالات إدارة المدخلات، الأخطاء، وحالة التحميل
@@ -16,6 +17,9 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [show, setShow] = useState(false);
+  const {
+    user: { role },
+  } = useContext(AuthContext);
 
   // 2. دالة التعامل مع عملية تسجيل الدخول
   const handleLogin = async (e) => {
@@ -34,7 +38,7 @@ const Login = () => {
       // 3. هنا يتم استدعاء الـ API
       // **هام:** استبدل 'YOUR_API_ENDPOINT/login' بمسار الـ API الحقيقي لتسجيل الدخول.
       const response = await axios.post(
-        "http://192.168.1.105:8080/api/Account/Login",
+        "http://loujico.somee.com/Api/Account/Login",
         {
           Email,
           Password,
@@ -46,15 +50,27 @@ const Login = () => {
 
       // 4. معالجة بيانات الاستجابة
       // الـ API يجب أن يعيد object يحتوي على token وبيانات المستخدم
-      const { data: token, user } = response.data;
+      const { data: token } = response.data;
       localStorage.setItem("authToken", token);
+      const decoded = jwtDecode(token);
+      const role =
+        decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+      const username =
+        decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
+      const employeeId = decoded.EmployeeId;
+
+      console.log(decoded);
 
       // 5. استخدام دالة الـ login من AuthContext
       // هذه الدالة ستقوم بتخزين بيانات المستخدم والـ token في الـ Context و localStorage
-      login({ ...user, token });
+      login({ username, role, employeeId, token });
 
       // 6. التوجيه إلى لوحة التحكم بعد نجاح تسجيل الدخول
-      navigate("/dashboard");
+      if (role === "Admin") {
+        navigate("/dashboard");
+      } else {
+        navigate("/projects");
+      }
     } catch (err) {
       // 7. معالجة الأخطاء
       // يمكنك استخدام `err.response?.data?.message` لعرض رسالة خطأ محددة من الـ API

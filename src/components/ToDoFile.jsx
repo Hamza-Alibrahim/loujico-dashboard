@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useContext } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const ToDoFile = ({ formData, setFormData, url }) => {
   const {
@@ -10,6 +11,9 @@ const ToDoFile = ({ formData, setFormData, url }) => {
   } = useTranslation();
   const [data, setData] = useState({});
   const fileInputRef = useRef(null);
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   const commonProps = {
     className: `px-3 py-2 bg-gray-200 rounded-md transition-colors hover:bg-gray-100 focus:bg-white focus-visible:outline-[var(--main-color)] w-full`,
@@ -33,15 +37,13 @@ const ToDoFile = ({ formData, setFormData, url }) => {
 
   const handleDelete = async (id) => {
     try {
-      const token = localStorage.getItem("authToken");
-
       if (!token) {
         setError("No authentication token found");
         return;
       }
 
       await axios.delete(
-        `http://192.168.1.105:8080/api${url}/DeleteFile/${id}`,
+        `http://loujico.somee.com/Api${url}/DeleteFile/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -114,7 +116,7 @@ const ToDoFile = ({ formData, setFormData, url }) => {
         {(formData.Data || []).map((file, i) => {
           return (
             <div
-              key={crypto.randomUUID()}
+              key={JSON.stringify(file)}
               className="flex justify-between items-center bg-gray-200 p-2 rounded-md"
             >
               <span>

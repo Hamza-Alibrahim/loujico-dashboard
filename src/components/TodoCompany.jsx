@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const ToDoCompany = ({ formData, setFormData }) => {
   const { t } = useTranslation();
@@ -9,6 +10,9 @@ const ToDoCompany = ({ formData, setFormData }) => {
   const [companies, setCompanies] = useState([]);
   const [companyName, setCompanyName] = useState("");
   const [error, setError] = useState("");
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   const commonProps = {
     className: `px-3 py-2 bg-gray-200 rounded-md transition-colors hover:bg-gray-100 focus:bg-white focus-visible:outline-[var(--main-color)] w-full`,
@@ -18,14 +22,14 @@ const ToDoCompany = ({ formData, setFormData }) => {
     const fetchCompanies = async () => {
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
+
         if (!token) {
           setError("Authentication token not found");
           return;
         }
 
         const response = await axios
-          .get("http://192.168.1.105:8080/api/Company/GetAllId", {
+          .get("http://loujico.somee.com/Api/Company/GetAllId", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -112,7 +116,10 @@ const ToDoCompany = ({ formData, setFormData }) => {
         >
           <option value="">{t("todoCompany.chooseCompany")}</option>
           {companies.map((comp) => (
-            <option key={crypto.randomUUID()} value={`${comp.id} ${comp.name}`}>
+            <option
+              key={JSON.stringify(comp)}
+              value={`${comp.id} ${comp.name}`}
+            >
               {comp.name}
             </option>
           ))}
@@ -158,9 +165,9 @@ const ToDoCompany = ({ formData, setFormData }) => {
 
       {/* Display added companies */}
       <div className="flex flex-col gap-2 mt-2">
-        {prepareCompaniesForDisplay().map((comp, index) => (
+        {prepareCompaniesForDisplay().map((comp) => (
           <div
-            key={crypto.randomUUID()}
+            key={JSON.stringify(comp)}
             className="flex justify-between gap-4 items-center bg-gray-200 p-2 rounded-md"
           >
             <div className="flex flex-col gap-2">

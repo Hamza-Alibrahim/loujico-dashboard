@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
-const ToDoEmp = ({ formData, setFormData }) => {
+const ToDoEmp = ({ formData, setFormData, required }) => {
   const { t } = useTranslation();
   const [data, setData] = useState({});
   const [employees, setEmployees] = useState([]);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   const commonProps = {
     className: `px-3 py-2 bg-gray-200 rounded-md transition-colors hover:bg-gray-100 focus:bg-white focus-visible:outline-[var(--main-color)] w-full`,
@@ -18,7 +22,6 @@ const ToDoEmp = ({ formData, setFormData }) => {
     const fetchData = async () => {
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -26,7 +29,7 @@ const ToDoEmp = ({ formData, setFormData }) => {
         }
 
         const response = await axios
-          .get("http://192.168.1.105:8080/api/Emp/GetAllId", {
+          .get("http://loujico.somee.com/Api/Emp/GetAllId", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -101,6 +104,7 @@ const ToDoEmp = ({ formData, setFormData }) => {
     <div className="flex flex-col gap-2">
       <h1 className="text-sm font-medium">
         {t("todoEmp.associatedEmployees")}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </h1>
       <div className="flex items-center flex-col sm:flex-row gap-2 sm:gap-4">
         <select
@@ -119,7 +123,7 @@ const ToDoEmp = ({ formData, setFormData }) => {
           {employees.map((emp) => {
             return (
               <option
-                key={crypto.randomUUID()}
+                key={JSON.stringify(emp)}
                 value={`${emp.id} ${emp.firstName} ${emp.lastName}`}
               >
                 {emp.firstName} {emp.lastName}
@@ -144,22 +148,24 @@ const ToDoEmp = ({ formData, setFormData }) => {
         {t("todoEmp.addButton")}
       </button>
       <div className="flex flex-col gap-2 mt-2">
-        {prepareEmployeesForDisplay().map((emp, index) => {
-          return (
-            <div
-              key={crypto.randomUUID()}
-              className="flex justify-between items-center bg-gray-200 p-2 rounded-md"
-            >
-              <span>
-                {emp.name} / {emp.roleOnProject}
-              </span>
-              <FaTrash
-                className="cursor-pointer hover:text-red-500"
-                onClick={() => handleRemoveEmployee(emp.employeeId)}
-              />
-            </div>
-          );
-        })}
+        {prepareEmployeesForDisplay().length
+          ? prepareEmployeesForDisplay().map((emp) => {
+              return (
+                <div
+                  key={JSON.stringify(emp)}
+                  className="flex justify-between items-center bg-gray-200 p-2 rounded-md"
+                >
+                  <span>
+                    {emp.name} / {emp.roleOnProject || emp.roleOnTask}
+                  </span>
+                  <FaTrash
+                    className="cursor-pointer hover:text-red-500"
+                    onClick={() => handleRemoveEmployee(emp.employeeId)}
+                  />
+                </div>
+              );
+            })
+          : null}
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 // src/components/SideBar.jsx
-import React, { useState } from "react";
+import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router-dom";
 import {
@@ -11,7 +11,6 @@ import {
   FaIndustry,
   FaBalanceScale,
   FaAddressBook,
-  FaCog,
   FaTasks,
   FaGlobeAmericas,
   FaMap,
@@ -21,7 +20,7 @@ import { AiFillProduct } from "react-icons/ai";
 import { HiDocumentText } from "react-icons/hi";
 import { IoClose } from "react-icons/io5";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
-import { FaMapLocation } from "react-icons/fa6";
+import { AuthContext } from "../Context/AuthContext";
 
 const SideBar = ({ isOpen, onClose }) => {
   const {
@@ -30,6 +29,9 @@ const SideBar = ({ isOpen, onClose }) => {
   } = useTranslation();
   const [openAccordions, setOpenAccordions] = useState({});
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const {
+    user: { role },
+  } = useContext(AuthContext);
 
   const toggleAccordion = (accordionName) => {
     setOpenAccordions((prev) => ({
@@ -137,9 +139,9 @@ const SideBar = ({ isOpen, onClose }) => {
     },
   ];
 
-  const renderSingleItem = (item, index) => (
+  const renderSingleItem = (item) => (
     <NavLink
-      key={crypto.randomUUID()}
+      key={item.name}
       to={item.path}
       onClick={onClose}
       className={({ isActive }) =>
@@ -168,13 +170,13 @@ const SideBar = ({ isOpen, onClose }) => {
     </NavLink>
   );
 
-  const renderAccordion = (item, index) => {
+  const renderAccordion = (item) => {
     const isAccordionOpen = openAccordions[item.title] || false;
     const AccordionChevron = isAccordionOpen ? FaChevronDown : FaChevronRight;
 
     return (
       <div
-        key={crypto.randomUUID()}
+        key={item.name}
         className="cursor-pointer bg-white text-[var(--text-color)]"
       >
         <div
@@ -217,9 +219,9 @@ const SideBar = ({ isOpen, onClose }) => {
             isAccordionOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          {item.children.map((child, childIndex) => (
+          {item.children.map((child) => (
             <NavLink
-              key={crypto.randomUUID()}
+              key={child.name}
               to={child.path}
               onClick={onClose}
               className={({ isActive }) =>
@@ -296,10 +298,16 @@ const SideBar = ({ isOpen, onClose }) => {
 
       <ul className="w-full">
         {sideBarItems.map((item, index) => {
-          if (item.type === "accordion") {
-            return renderAccordion(item, index);
+          if (role === "Admin") {
+            if (item.type === "accordion") {
+              return renderAccordion(item, index);
+            } else {
+              return renderSingleItem(item, index);
+            }
           } else {
-            return renderSingleItem(item, index);
+            if (item.path === "/projects") {
+              return renderSingleItem(item, index);
+            }
           }
         })}
 

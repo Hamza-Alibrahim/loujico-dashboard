@@ -2,8 +2,9 @@ import DashTable from "./DashTable";
 import { productFields as popUpFields } from "../popUpFields";
 import { productFields } from "../fields";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const Products = () => {
   const { t } = useTranslation();
@@ -16,13 +17,15 @@ const Products = () => {
   const [count, setCount] = useState(10);
   const [search, setSearch] = useState("");
   const [total, setTotal] = useState(0);
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -32,7 +35,7 @@ const Products = () => {
         if (search) {
           const response = await axios
             .get(
-              `http://192.168.1.105:8080/api/Product/Search?page=${page}&count=${count}&name=${search}`,
+              `http://loujico.somee.com/Api/Product/Search?page=${page}&count=${count}&name=${search}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -47,7 +50,7 @@ const Products = () => {
         } else {
           const response = await axios
             .get(
-              `http://192.168.1.105:8080/api/Product/GetAll?page=${page}&count=${count}`,
+              `http://loujico.somee.com/Api/Product/GetAll?page=${page}&count=${count}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -74,15 +77,13 @@ const Products = () => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-
         if (!token) {
           setError("Authentication token not found");
           return;
         }
 
         const response = await axios
-          .get(`http://192.168.1.105:8080/api/Product/GetCount`, {
+          .get(`http://loujico.somee.com/Api/Product/GetCount`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

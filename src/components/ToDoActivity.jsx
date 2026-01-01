@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const ToDoActivity = ({ formData, setFormData }) => {
   const { t } = useTranslation();
@@ -10,6 +11,9 @@ const ToDoActivity = ({ formData, setFormData }) => {
   const [selectedIndustryId, setSelectedIndustryId] = useState("");
   const [selectedActivityId, setSelectedActivityId] = useState("");
   const [error, setError] = useState("");
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   const commonProps = {
     className: `px-3 py-2 bg-gray-200 rounded-md transition-colors hover:bg-gray-100 focus:bg-white focus-visible:outline-[var(--main-color)] w-full`,
@@ -20,7 +24,6 @@ const ToDoActivity = ({ formData, setFormData }) => {
     const fetchIndustries = async () => {
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -28,7 +31,7 @@ const ToDoActivity = ({ formData, setFormData }) => {
         }
 
         const response = await axios
-          .get("http://192.168.1.105:8080/api/Settings/GetAllIndustryType", {
+          .get("http://loujico.somee.com/Api/Settings/GetAllIndustryType", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -56,7 +59,6 @@ const ToDoActivity = ({ formData, setFormData }) => {
 
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -65,7 +67,7 @@ const ToDoActivity = ({ formData, setFormData }) => {
 
         const response = await axios
           .get(
-            `http://192.168.1.105:8080/api/Settings/GetActivityByIndustry/${selectedIndustryId}`,
+            `http://loujico.somee.com/Api/Settings/GetActivityByIndustry/${selectedIndustryId}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -149,7 +151,7 @@ const ToDoActivity = ({ formData, setFormData }) => {
         >
           <option value="">{t("todoActivity.chooseIndustry")}</option>
           {industries.map((industry) => (
-            <option key={crypto.randomUUID()} value={industry.id}>
+            <option key={JSON.stringify(industry)} value={industry.id}>
               {industry.name}
             </option>
           ))}
@@ -164,7 +166,7 @@ const ToDoActivity = ({ formData, setFormData }) => {
         >
           <option value="">{t("todoActivity.chooseActivity")}</option>
           {activities.map((activity) => (
-            <option key={crypto.randomUUID()} value={activity.id}>
+            <option key={JSON.stringify(activity)} value={activity.id}>
               {activity.name}
             </option>
           ))}
@@ -184,7 +186,7 @@ const ToDoActivity = ({ formData, setFormData }) => {
         {(formData.activities || []).map((activity, index) => {
           return (
             <div
-              key={crypto.randomUUID()}
+              key={JSON.stringify(activity)}
               className="flex justify-between items-center bg-gray-200 p-2 rounded-md"
             >
               <span>

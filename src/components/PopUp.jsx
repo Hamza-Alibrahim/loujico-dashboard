@@ -89,7 +89,9 @@ const PopUp = ({
 
     // Check if field is required
     if (field.required && (!value || value.toString().trim() === "")) {
-      error = t("popup.validation.required", { field: t(field.title) });
+      error = t("popup.validation.required", {
+        field: field.title || field.name[0].toUpperCase() + field.name.slice(1),
+      });
     }
     // Email format validation
     else if (field.type === "email" && value) {
@@ -284,7 +286,10 @@ const PopUp = ({
     } else {
       fields.forEach((field) => {
         if (field.type !== "hidden") {
-          const error = validateField(field.name, formData[field.name]);
+          const error = validateField(
+            field.name,
+            formData[field.type === "employee" ? "employees" : field.name]
+          );
           if (error) allErrors[field.name] = error;
         }
       });
@@ -379,7 +384,13 @@ const PopUp = ({
       case "contact":
         return <ToDoCountry formData={formData} setFormData={setFormData} />;
       case "employee":
-        return <ToDoEmp formData={formData} setFormData={setFormData} />;
+        return (
+          <ToDoEmp
+            required={field.required}
+            formData={formData}
+            setFormData={setFormData}
+          />
+        );
       case "company":
         return <ToDoCompany formData={formData} setFormData={setFormData} />;
       case "activity":
@@ -496,8 +507,8 @@ const PopUp = ({
                   {field.name && (
                     <label htmlFor={field.name} className="text-sm font-medium">
                       {t(field.title)}
-                      {field.required && (
-                        <span className="text-red-500 mr-1">*</span>
+                      {field.required && field.type !== "employee" && (
+                        <span className="text-red-500 ml-1">*</span>
                       )}
                     </label>
                   )}

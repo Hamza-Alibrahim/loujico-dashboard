@@ -185,12 +185,20 @@
       "updatedBy": "Updated By",
       "employees": "Employees",
       "files": "Files",
+      "tasks": "Tasks",
       "companies": "Companies"
+    },
+    "task": {
+      "id": "Task ID",
+      "title": "Task Title",
+      "estimatedHours": "Estimated Hours",
+      "assignedEmployees": "Assigned Employees"
     },
     "employee": {
       "id": "ID",
       "firstName": "First Name",
       "lastName": "Last Name",
+      "name": "Name",
       "age": "Age",
       "address": "Address",
       "phone": "Phone Number",
@@ -203,7 +211,8 @@
       "isPresent": "Presence Status",
       "department": "Department",
       "notes": "Notes",
-      "contactName": "Contact Name"
+      "contactName": "Contact Name",
+      "assignedAt": "Assigned At"
     },
     "company": {
       "id": "ID",
@@ -463,8 +472,34 @@
     }
   },
   "popupFields": {
+    "task": {
+      "id": "Task ID",
+      "projectId": "Project ID",
+      "title": "Task Title",
+      "titlePlaceholder": "Enter task title...",
+      "description": "Description",
+      "descriptionPlaceholder": "Enter task description...",
+      "estimatedHours": "Estimated Hours",
+      "estimatedHoursPlaceholder": "Enter estimated hours...",
+      "actualHours": "Actual Hours",
+      "actualHoursPlaceholder": "Actual hours worked...",
+      "status": "Status",
+      "priority": "Priority",
+      "startDate": "Start Date",
+      "dueDate": "Due Date",
+      "completedDate": "Completed Date",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "assignees": "Assigned Employees",
+      "assigneesPlaceholder": "Select employees to assign...",
+      "tags": "Tags",
+      "tagsPlaceholder": "Add tags...",
+      "submissionFiles": "Submission Files",
+      "statusUpdateFiles": "Files for Status Update"
+    },
     "employee": {
       "id": "ID",
+      "userId": "User ID",
       "firstName": "First Name",
       "lastName": "Last Name",
       "age": "Age",
@@ -598,8 +633,8 @@
       },
       "userRole": {
         "admin": "System Administrator",
-        "user": "User",
-        "viewer": "Viewer"
+        "team_Leader": "Team Leader",
+        "programmer": "Programmer"
       }
     },
     "suffix": {
@@ -623,7 +658,8 @@
       "activity": "Activity",
       "file": "File",
       "company": "Company",
-      "address": "Address"
+      "address": "Address",
+      "task": "Task"
     },
     "errors": {
       "addFailed": "Failed to add item",
@@ -641,6 +677,33 @@
     "addActivity": "Add Activity",
     "addFile": "Add File",
     "option": "data type to add",
-    "confirmDelete": "Are you sure you want to delete this item?"
+    "confirmDelete": "Are you sure you want to delete this item?",
+    "noDescription": "No description",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "assignees": "Assignees",
+    "noDate": "No date",
+    "noTasks": "No tasks found",
+    "estimatedHours": "{{hours}}h estimated",
+    "addTask": "Add Task",
+    "editTask": "Edit Task",
+    "deleteTask": "Delete Task",
+    "update": "Update",
+    "cancel": "Cancel",
+    "searchTasks": "Search tasks...",
+    "search": "Search",
+    "myTasks": "My Tasks",
+    "clearFilters": "Clear Filters",
+    "activeFilters": "Active filters",
+    "status": "Status",
+    "noTasksWithFilters": "No tasks found with current filters",
+    "viewDetails": "View Details",
+    "statusOption": {
+      "All": "All Statuses",
+      "Pending": "Pending",
+      "InProgress": "In Progress",
+      "Completed": "Completed",
+      "Cancelled": "Cancelled"
+    }
   }
 }

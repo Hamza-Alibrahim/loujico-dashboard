@@ -185,12 +185,20 @@
       "updatedBy": "تم التحديث بواسطة",
       "employees": "الموظفون",
       "files": "الملفات",
+      "tasks": "المهمات",
       "companies": "الشركات"
+    },
+    "task": {
+      "id": "معرف المهمة",
+      "title": "عنوان المهمة",
+      "estimatedHours": "الساعات المقدرة",
+      "assignedEmployees": "الموظفون المكلفون"
     },
     "employee": {
       "id": "المعرف",
       "firstName": "الاسم الأول",
       "lastName": "الاسم الأخير",
+      "name": "الاسم",
       "age": "العمر",
       "address": "العنوان",
       "phone": "رقم الهاتف",
@@ -203,7 +211,8 @@
       "isPresent": "حالة التواجد",
       "department": "القسم",
       "notes": "الملاحظات",
-      "contactName": "طرق التواصل"
+      "contactName": "طرق التواصل",
+      "assignedAt": "تم تعيينه في"
     },
     "company": {
       "id": "المعرف",
@@ -464,6 +473,7 @@
   "popupFields": {
     "employee": {
       "id": "المعرف",
+      "userId": "معرف المستخدم",
       "firstName": "الاسم الأول",
       "lastName": "الاسم الأخير",
       "age": "العمر",
@@ -597,8 +607,8 @@
       },
       "userRole": {
         "admin": "مدير النظام",
-        "user": "مستخدم",
-        "viewer": "مشاهد"
+        "team_Leader": "قائد الفريق",
+        "programmer": "مبرمج"
       }
     },
     "suffix": {
@@ -640,6 +650,33 @@
     "addActivity": "إضافة نشاط",
     "addFile": "إضافة ملف",
     "option": "نوع البيانات المراد إضافته",
-    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟"
+    "confirmDelete": "هل أنت متأكد أنك تريد حذف هذا العنصر؟",
+    "noDescription": "لا يوجد وصف",
+    "showMore": "عرض المزيد",
+    "showLess": "عرض أقل",
+    "assignees": "المكلفون",
+    "noDate": "لا يوجد تاريخ",
+    "noTasks": "لم يتم العثور على مهام",
+    "estimatedHours": "{{hours}} ساعة مقدرة",
+    "addTask": "إضافة مهمة",
+    "editTask": "تعديل المهمة",
+    "deleteTask": "حذف المهمة",
+    "update": "تحديث",
+    "cancel": "إلغاء",
+    "searchTasks": "بحث في المهام...",
+    "search": "بحث",
+    "myTasks": "مهامي",
+    "clearFilters": "مسح الفلاتر",
+    "activeFilters": "الفلاتر النشطة",
+    "status": "الحالة",
+    "noTasksWithFilters": "لم يتم العثور على مهام مع الفلاتر الحالية",
+    "viewDetails": "عرض التفاصيل",
+    "statusOption": {
+      "All": "جميع الحالات",
+      "Pending": "معلق",
+      "InProgress": "قيد التنفيذ",
+      "Completed": "مكتمل",
+      "Cancelled": "ملغى"
+    }
   }
 }

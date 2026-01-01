@@ -5,6 +5,12 @@ export const employeeFields = [
     type: "hidden",
   },
   {
+    name: "userId",
+    title: "popupFields.employee.userId",
+    type: "select",
+    api: "http://loujico.somee.com/Api/Account/UserListId"
+  },
+  {
     name: "firstName",
     title: "popupFields.employee.firstName",
     type: "text",
@@ -311,7 +317,7 @@ export const companyFields = [
     name: "legalId",
     title: "fields.companyContactFields.legal.id",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Settings/GetAllLegalType",
+    api: "http://loujico.somee.com/Api/Settings/GetAllLegalType",
   },
   // company: companyDetailFields,
   // addresses: companyAddressesFields,
@@ -331,7 +337,7 @@ export const projectFields = [
     name: "companyId",
     title: "popupFields.project.companyId",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Company/GetAllId",
+    api: "http://loujico.somee.com/Api/Company/GetAllId",
   },
   {
     name: "title",
@@ -451,13 +457,13 @@ export const invoiceFields = [
     name: "clientId",
     title: "popupFields.invoice.clientId",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Customer/GetAllId",
+    api: "http://loujico.somee.com/Api/Customer/GetAllId",
   },
   {
     name: "projectId",
     title: "popupFields.invoice.projectId",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Project/GetAllId",
+    api: "http://loujico.somee.com/Api/Project/GetAllId",
   },
   {
     name: "amount",
@@ -522,8 +528,8 @@ export const userFields = [
     type: "select",
     options: [
       { value: "Admin", label: "popupFields.options.userRole.admin" },
-      // { value: "User", label: "popupFields.options.userRole.user" },
-      // { value: "Viewer", label: "popupFields.options.userRole.viewer" },
+      { value: "Team_Leader", label: "popupFields.options.userRole.team_Leader" },
+      { value: "Programmer", label: "popupFields.options.userRole.programmer" },
     ],
     required: true,
   },
@@ -567,7 +573,7 @@ export const activityFields = [
     name: "IndustryId",
     title: "fields.activity.industryName",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Settings/GetAllIndustryType",
+    api: "http://loujico.somee.com/Api/Settings/GetAllIndustryType",
     required: true,
   },
 ];
@@ -632,6 +638,60 @@ export const addCompanyFields = {
       type: "company",
     },
   ],
+  task: [
+    {
+      name: "id",
+      title: "popupFields.task.id",
+      type: "hidden",
+    },
+    {
+      name: "projectId",
+      title: "popupFields.task.projectId",
+      type: "hidden",
+    },
+    {
+      name: "title",
+      title: "popupFields.task.title",
+      type: "text",
+      required: true,
+      placeholder: "popupFields.task.titlePlaceholder"
+    },
+    {
+      name: "estimatedHours",
+      title: "popupFields.task.estimatedHours",
+      type: "number",
+      min: 1,
+      required: true,
+      placeholder: "popupFields.task.estimatedHoursPlaceholder"
+    },
+    {
+      name: "status",
+      title: "popupFields.task.status",
+      type: "select",
+      options: [
+        { value: "Pending", label: "detailView.statusOption.Pending" },
+        { value: "InProgress", label: "detailView.statusOption.InProgress" },
+        { value: "Completed", label: "detailView.statusOption.Completed" },
+        { value: "Cancelled", label: "detailView.statusOption.Cancelled" },
+      ],
+      required: true,
+      placeholder: "popupFields.task.estimatedHoursPlaceholder"
+    },
+    {
+      name: "description",
+      title: "popupFields.task.description",
+      type: "textarea",
+      placeholder: "popupFields.task.descriptionPlaceholder"
+    },
+    {
+      name: "employee",
+      type: "employee",
+      required: true,
+    },
+    {
+      type: "file",
+    },
+  ]
 };
 
 export const countryFields = [
@@ -648,7 +708,7 @@ export const stateFields = [
     name: "id",
     title: "fields.state.countryId",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Location/GetAllCountry",
+    api: "http://loujico.somee.com/Api/Location/GetAllCountry",
     required: true,
   },
   {
@@ -664,7 +724,7 @@ export const cityFields = [
     name: "id",
     title: "fields.city.stateId",
     type: "select",
-    api: "http://192.168.1.105:8080/api/Location/GetAllState",
+    api: "http://loujico.somee.com/Api/Location/GetAllState",
     required: true,
   },
   {

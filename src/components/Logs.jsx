@@ -1,8 +1,9 @@
 import DashTable from "./DashTable";
 import { logFields } from "../fields";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const Logs = () => {
   const { t } = useTranslation();
@@ -15,13 +16,15 @@ const Logs = () => {
   const [count, setCount] = useState(10);
   const [search, setSearch] = useState("");
   const [total, setTotal] = useState(0);
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -31,7 +34,7 @@ const Logs = () => {
         if (search) {
           const response = await axios
             .get(
-              `http://192.168.1.105:8080/api/Logs/Search?page=${page}&count=${count}&name=${search}`,
+              `http://loujico.somee.com/Api/Logs/Search?page=${page}&count=${count}&name=${search}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -46,7 +49,7 @@ const Logs = () => {
         } else {
           const response = await axios
             .get(
-              `http://192.168.1.105:8080/api/Logs/GetAll?page=${page}&count=${count}`,
+              `http://loujico.somee.com/Api/Logs/GetAll?page=${page}&count=${count}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -73,15 +76,13 @@ const Logs = () => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-
         if (!token) {
           setError("Authentication token not found");
           return;
         }
 
         const response = await axios
-          .get(`http://192.168.1.105:8080/api/Logs/GetCount`, {
+          .get(`http://loujico.somee.com/Api/Logs/GetCount`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

@@ -32,7 +32,7 @@
 //         if (search) {
 //           const response = await axios
 //             .get(
-//               `http://192.168.1.105:8080/api/Invoices/Search?page=${page}&count=${count}&name=${search}`,
+//               `http://loujico.somee.com/Api/Invoices/Search?page=${page}&count=${count}&name=${search}`,
 //               {
 //                 //timeout: 5000,
 //                 headers: {
@@ -47,7 +47,7 @@
 //         } else {
 //           const response = await axios
 //             .get(
-//               `http://192.168.1.105:8080/api/Invoices/GetAll?page=${page}&count=${count}`,
+//               `http://loujico.somee.com/Api/Invoices/GetAll?page=${page}&count=${count}`,
 //               {
 //                 //timeout: 5000,
 //                 headers: {
@@ -82,7 +82,7 @@
 //         }
 
 //         const response = await axios
-//           .get(`http://192.168.1.105:8080/api/Invoices/GetCount`, {
+//           .get(`http://loujico.somee.com/Api/Invoices/GetCount`, {
 //             headers: {
 //               Authorization: `Bearer ${token}`,
 //               "Content-Type": "application/json",

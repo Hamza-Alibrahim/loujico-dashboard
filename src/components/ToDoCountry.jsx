@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import Select from "./Select";
+import { AuthContext } from "../Context/AuthContext";
 
 const ToDoCountry = ({ formData, setFormData }) => {
   const { t } = useTranslation();
@@ -12,6 +12,9 @@ const ToDoCountry = ({ formData, setFormData }) => {
   const [contactTypeId, setContactTypeId] = useState("");
   const [contactValue, setContactValue] = useState("");
   const [contactTypes, setContactTypes] = useState([]);
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   const commonProps = {
     className: `px-3 py-2 bg-gray-200 rounded-md transition-colors hover:bg-gray-100 focus:bg-white focus-visible:outline-[var(--main-color)] w-full`,
@@ -20,11 +23,10 @@ const ToDoCountry = ({ formData, setFormData }) => {
   useEffect(() => {
     const fetchContactTypes = async () => {
       try {
-        const token = localStorage.getItem("authToken");
         if (!token) return;
 
         const response = await axios.get(
-          "http://192.168.1.105:8080/api/Settings/GetAllContactType",
+          "http://loujico.somee.com/Api/Settings/GetAllContactType",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -119,7 +121,7 @@ const ToDoCountry = ({ formData, setFormData }) => {
           >
             <option value="">{t("todoCountry.rolePlaceholder")}</option>
             {contactTypes.map((type) => (
-              <option key={crypto.randomUUID()} value={type.id}>
+              <option key={JSON.stringify(type)} value={type.id}>
                 {type.name}
               </option>
             ))}
@@ -161,7 +163,7 @@ const ToDoCountry = ({ formData, setFormData }) => {
         {(formData.contacts || []).map((contact, index) => {
           return (
             <div
-              key={crypto.randomUUID()}
+              key={JSON.stringify(contact)}
               className="flex justify-between items-center bg-gray-200 p-2 rounded-md"
             >
               <span>

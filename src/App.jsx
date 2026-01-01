@@ -1,4 +1,3 @@
-// src/App.jsx
 import "./i18n";
 import React, { useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
@@ -10,7 +9,6 @@ import Users from "./components/Users";
 import Clients from "./components/Clients";
 import Employees from "./components/Employees";
 import Projects from "./components/Projects";
-// import Invoices from "./components/Invoices";
 import SideBar from "./components/SideBar";
 import Products from "./components/Products";
 import Logs from "./components/Logs";

@@ -1,7 +1,9 @@
 // src/Pages/Home.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../Context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 // Component for a single metric card
 const MetricCard = ({ title, value, unit, color }) => (
@@ -28,13 +30,15 @@ const Home = () => {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchDta = async () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -42,7 +46,7 @@ const Home = () => {
         }
 
         const response = await axios
-          .get("http://192.168.1.105:8080/api/Dashbourd/GetDashboard", {
+          .get("http://loujico.somee.com/Api/Dashbourd/GetDashboard", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

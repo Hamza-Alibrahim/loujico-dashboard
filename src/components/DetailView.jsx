@@ -1,31 +1,78 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useCallback, useRef } from "react";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import { getDetailFields } from "../detailFields";
-import { FaTimes, FaTrash } from "react-icons/fa";
+import {
+  FaAngleLeft,
+  FaAngleRight,
+  FaEdit,
+  FaPlus,
+  FaSearch,
+  FaTimes,
+  FaTrash,
+} from "react-icons/fa";
 import History from "./History";
 import PopUp from "./PopUp";
 import { addCompanyFields } from "../popUpFields";
-import Select from "./Select";
+import { AuthContext } from "../Context/AuthContext";
 
 const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadingTasks, setLoadingTasks] = useState(true);
   const [refresh, setRefresh] = useState(false);
+  const [refreshTasks, setRefreshTasks] = useState(false);
   const [error, setError] = useState(null);
   const [popup, setPopup] = useState("");
   const [open, setOpen] = useState(false);
-  const { t } = useTranslation();
+  const [tasksPage, setTasksPage] = useState(1);
+  const [tasksPageSize, setTasksPageSize] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
+  const [myTasksOnly, setMyTasksOnly] = useState(false);
+  const [editTask, setEditTask] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [taskDetails, setTaskDetails] = useState({});
+  const [title, setTitle] = useState(false);
+  const {
+    user: { token, role, employeeId },
+  } = useContext(AuthContext);
+  const { t, i18n } = useTranslation();
 
-  const fields = getDetailFields(type);
+  const debounceTimerRef = useRef(null);
+
+  const canManageTasks = role !== "Programmer";
+  const isProgrammer = role === "Programmer";
+  const fields = getDetailFields(
+    Object.keys(taskDetails).length && !editTask ? "Task" : type
+  );
   const dataToShow = data;
-  const popUpFields = addCompanyFields[popup] || [];
+  let popUpFields = addCompanyFields[popup] || [];
+
+  if (popup === "task" && !editTask) {
+    popUpFields = popUpFields.filter((field) => {
+      if (field.name !== "status" && field.type !== "file") {
+        return true;
+      }
+
+      return false;
+    });
+  }
+
   const options =
     name === "product"
       ? ["Company"]
       : ["Employee", "Contact", "Activity", "File", "Address"];
+  const statusOptions = [
+    "All",
+    "Pending",
+    "InProgress",
+    "Completed",
+    "Cancelled",
+  ];
   const getHandleAdd = () => {
     const addFunctions = {
+      task: AddTask,
       employee: AddEmployee,
       contact: AddContact,
       activity: AddActivity,
@@ -36,11 +83,11 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     return addFunctions[popup];
   };
 
+  // Fetch main data (company/project/product details)
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMainData = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("No authentication token found");
@@ -48,7 +95,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         }
 
         const response = await axios
-          .get(`http://192.168.1.105:8080/api/${type}/GetById/${id}`, {
+          .get(`http://loujico.somee.com/Api/${type}/GetById/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -56,10 +103,11 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           })
           .then((res) => res.data);
 
-        setData({
+        setData((prev) => ({
+          ...prev,
           files: response.data.files,
           ...response.data[name.toLowerCase()],
-        });
+        }));
       } catch (err) {
         console.error("Error fetching details:", err);
         setError(t("detailView.fetchError"));
@@ -69,15 +117,151 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     };
 
     if (id && type !== "Account" && type !== "Logs") {
-      fetchData();
+      fetchMainData();
     } else {
       setData(fallBack);
       setLoading(false);
     }
-  }, [id, type, refresh]);
+  }, [refresh]);
 
-  const getToken = () => {
-    return localStorage.getItem("authToken");
+  useEffect(() => {
+    const loadTasks = async () => {
+      if (!id || type !== "Project") return;
+
+      setData((prev) => ({
+        ...prev,
+        tasks: { items: [], totalCount: 0 },
+      }));
+
+      try {
+        setLoadingTasks(true);
+        const response = await axios.get(
+          `http://loujico.somee.com/Api/Task/GetAll?projectId=${id}&page=${tasksPage}&pageSize=${tasksPageSize}&myTasks=${myTasksOnly}&status=${statusFilter}&search=${debouncedSearchQuery}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const tasks = response.data;
+
+        setData((prev) => ({
+          ...prev,
+          tasks,
+        }));
+      } catch (err) {
+        console.error("Error loading tasks:", err);
+        // Keep existing tasks data if fetch fails
+      } finally {
+        setLoadingTasks(false);
+      }
+    };
+
+    loadTasks();
+  }, [
+    refreshTasks,
+    tasksPage,
+    tasksPageSize,
+    debouncedSearchQuery,
+    myTasksOnly,
+    statusFilter,
+  ]);
+
+  const handleTasksPageChange = (newPage) => {
+    if (newPage < 1) return;
+    setTasksPage(newPage);
+  };
+
+  const handleTasksPageSizeChange = (newSize) => {
+    setTasksPageSize(newSize);
+    setTasksPage(1); // Reset to first page when changing page size
+  };
+
+  const handleSearchChange = (value) => {
+    setSearchQuery(value);
+
+    // Clear existing timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Set new timer
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(value);
+      setTasksPage(1); // Reset to first page when search changes
+    }, 500); // 500ms delay
+  };
+
+  const getTaskDetails = async (id, load) => {
+    setTaskDetails({});
+    if (load) {
+      setTitle(`${id}`);
+      setLoading(true);
+    }
+    try {
+      const response = await axios
+        .get(`http://loujico.somee.com/Api/Task/GetById/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        })
+        .then((res) => res.data);
+
+      if (!load) {
+        response.employees = response.assignedEmployees.map((emp) => {
+          return { employeeId: emp.employeeId, roleOnProject: emp.roleOnTask };
+        });
+        response.Data = response.files;
+        delete response.assignedEmployees;
+        delete response.files;
+      }
+
+      setTaskDetails({ ...response });
+
+      return response.data;
+    } catch (err) {
+      setTitle(false);
+      const errorMessage = handleApiError(
+        err,
+        t("dashTable.errors.updateFailed", { item: searchPlaceHolder })
+      );
+      console.error("Get one error:", errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdateTaskStatus = async (id, status) => {
+    try {
+      const response = await axios
+        .patch(
+          `http://loujico.somee.com/Api/Task/EditTaskStatus/${id}?Status=${status}`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => res.data);
+
+      setRefreshTasks((prev) => !prev);
+      getTaskDetails(id, true);
+      return response.data;
+    } catch (err) {
+      const errorMessage = handleApiError(
+        err,
+        t("dashTable.errors.updateFailed", { item: "searchPlaceHolder" })
+      );
+      console.error("Get one error:", errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
   };
 
   const handleApiError = (err, defaultMessage) => {
@@ -113,7 +297,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
   // ADD FUNCTIONS
   const AddContact = async (body) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -121,7 +304,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.post(
-        `http://192.168.1.105:8080/api/Company/AddContacts/${id}`,
+        `http://loujico.somee.com/Api/Company/AddContacts/${id}`,
         body.contacts,
         {
           headers: {
@@ -143,9 +326,53 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     }
   };
 
+  const AddTask = async (body) => {
+    setError(null);
+    if (!token) {
+      setError("Authentication token not found");
+      return;
+    }
+
+    try {
+      body.projectId = id;
+
+      body.assignedEmployees = body.employees
+        ? body.employees.map((emp) => {
+            return {
+              employeeId: +emp.employeeId,
+              roleOnTask: emp.roleOnProject,
+            };
+          })
+        : [];
+      delete body.employees;
+
+      console.log(body);
+
+      const response = await axios.post(
+        `http://loujico.somee.com/Api/Task/Add`,
+        body,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRefreshTasks((prev) => !prev);
+      return response.data;
+    } catch (err) {
+      const errorMessage = handleApiError(
+        err,
+        t("detailView.errors.addFailed")
+      );
+      console.error("Add employee error:", errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
   const AddEmployee = async (body) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -155,7 +382,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body);
 
       const response = await axios.post(
-        `http://192.168.1.105:8080/api/Company/AddEmployees/${id}`,
+        `http://loujico.somee.com/Api/Company/AddEmployees/${id}`,
         [body],
         {
           headers: {
@@ -179,7 +406,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const AddActivity = async (body) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -189,7 +415,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body.activities);
 
       const response = await axios.post(
-        `http://192.168.1.105:8080/api/Company/AddActivities/${id}`,
+        `http://loujico.somee.com/Api/Company/AddActivities/${id}`,
         body.activities,
         {
           headers: {
@@ -213,7 +439,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const AddAdress = async (body) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -223,7 +448,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body.addresses);
 
       const response = await axios.post(
-        `http://192.168.1.105:8080/api/Company/AddAddresses/${id}`,
+        `http://loujico.somee.com/Api/Company/AddAddresses/${id}`,
         body.addresses,
         {
           headers: {
@@ -247,7 +472,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const AddCompany = async (body) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -257,7 +481,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body.company);
 
       const response = await axios.post(
-        `http://192.168.1.105:8080/api/Product/AddCompany/${id}`,
+        `http://loujico.somee.com/Api/Product/AddCompany/${id}`,
         body.company,
         {
           headers: {
@@ -303,9 +527,20 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       formData.append(key, value);
     });
 
-    // Handle employees array - TWO OPTIONS:
-
     // OPTION 1: As individual fields (recommended for ASP.NET model binding)
+    if (body.assignedEmployees && Array.isArray(body.assignedEmployees)) {
+      body.assignedEmployees.forEach((employee, index) => {
+        formData.append(
+          `AssignedEmployees[${index}].EmployeeId`,
+          employee.employeeId
+        );
+        formData.append(
+          `AssignedEmployees[${index}].RoleOnTask`,
+          employee.roleOnTask
+        );
+      });
+    }
+
     if (body.employees && Array.isArray(body.employees)) {
       body.employees.forEach((employee, index) => {
         formData.append(`Employees[${index}].EmployeeId`, employee.employeeId);
@@ -338,7 +573,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const AddFile = async (body) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -349,7 +583,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       const data = convertToFormData(body);
 
       const response = await axios.post(
-        `http://192.168.1.105:8080/api/Company/AddFiles/${id}`,
+        `http://loujico.somee.com/Api/Company/AddFiles/${id}`,
         data,
         {
           headers: {
@@ -374,7 +608,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
   // DELETE FUNCTIONS (PATCH requests)
   const DeleteContact = async (contactId) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -389,19 +622,8 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           contactTypeId: contact.contactTypeId,
         }));
 
-      console.log(
-        `http://192.168.1.105:8080/api/Company/EditContacts/${id}`,
-        updatedContacts,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
       const response = await axios.patch(
-        `http://192.168.1.105:8080/api/Company/EditContacts/${id}`,
+        `http://loujico.somee.com/Api/Company/EditContacts/${id}`,
         updatedContacts,
         {
           headers: {
@@ -424,9 +646,88 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     }
   };
 
+  const DeleteTask = async (taskId) => {
+    setError(null);
+    if (!token) {
+      setError("Authentication token not found");
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://loujico.somee.com/Api/Task/Delete/${taskId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRefreshTasks((prev) => !prev);
+      return response.data;
+    } catch (err) {
+      const errorMessage = handleApiError(
+        err,
+        t("detailView.errors.deleteFailed")
+      );
+      console.error("Delete employee error:", errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
+  const EditTask = async (body) => {
+    setError(null);
+    if (!token) {
+      setError("Authentication token not found");
+      return;
+    }
+
+    setError(null);
+    if (!token) {
+      setError("Authentication token not found");
+      return;
+    }
+
+    try {
+      body.assignedEmployees = body.employees
+        ? body.employees.map((emp) => {
+            return {
+              employeeId: +emp.employeeId,
+              roleOnTask: emp.roleOnProject,
+            };
+          })
+        : [];
+      delete body.employees;
+
+      console.log(body);
+      const data = convertToFormData(body);
+
+      const response = await axios.patch(
+        `http://loujico.somee.com/Api/Task/Edit?id=${body.id}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setRefreshTasks((prev) => !prev);
+      return response.data;
+    } catch (err) {
+      const errorMessage = handleApiError(
+        err,
+        t("detailView.errors.deleteFailed")
+      );
+      console.error("Delete employee error:", errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
   const DeleteEmployee = async (employeeId, role = "") => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -443,7 +744,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         const formData = convertToFormData(newdata);
         console.log(newdata);
         const response = await axios.patch(
-          `http://192.168.1.105:8080/api/${type}/Edit`,
+          `http://loujico.somee.com/Api/${type}/Edit`,
           formData,
           {
             headers: {
@@ -459,7 +760,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           (emp) => emp.id !== employeeId
         );
         const response = await axios.patch(
-          `http://192.168.1.105:8080/api/Company/EditEmployees/${id}`,
+          `http://loujico.somee.com/Api/Company/EditEmployees/${id}`,
           updatedEmployees,
           {
             headers: {
@@ -485,7 +786,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const DeleteActivity = async (activityId) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -499,7 +799,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(updatedActivities);
 
       const response = await axios.patch(
-        `http://192.168.1.105:8080/api/Company/EditActivities/${id}`,
+        `http://loujico.somee.com/Api/Company/EditActivities/${id}`,
         updatedActivities,
         {
           headers: {
@@ -524,7 +824,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const DeleteAddress = async (addressId) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -538,7 +837,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(updatedaddresses);
 
       const response = await axios.patch(
-        `http://192.168.1.105:8080/api/Company/Editaddresses/${id}`,
+        `http://loujico.somee.com/Api/Company/Editaddresses/${id}`,
         updatedaddresses,
         {
           headers: {
@@ -563,7 +862,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const DeleteFile = async (fileId) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -571,7 +869,9 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.delete(
-        `http://192.168.1.105:8080/api/${type}/DeleteFile/${fileId}`,
+        `http://loujico.somee.com/Api/${
+          Object.keys(taskDetails).length && !editTask ? "Task" : type
+        }/DeleteFile/${fileId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -595,7 +895,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
   const DeleteCompany = async (companyId) => {
     setError(null);
-    const token = getToken();
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -603,7 +902,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.delete(
-        `http://192.168.1.105:8080/api/Product/DeleteCompany/${id}?companyId=${companyId}`,
+        `http://loujico.somee.com/Api/Product/DeleteCompany/${id}?companyId=${companyId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -667,7 +966,12 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       <div className="p-6 bg-gray-300 min-h-screen">
         <div className="p-8 rounded-md bg-white">
           <h1 className="text-3xl font-bold text-[var(--main-color)] mb-6">
-            {t(`detailView.title.${type}`)}
+            {t(`detailView.title.${type}`)}{" "}
+            {title
+              ? i18n.language === "en"
+                ? "( Task / " + title + " )"
+                : "( مهمة / " + title + " )"
+              : ""}
           </h1>
           <div className="flex justify-center items-center h-64">
             <div className="flex space-x-2">
@@ -696,13 +1000,74 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     const content = (() => {
       switch (field.name) {
+        case "assignedEmployees":
+          return (
+            <div className="flex flex-col gap-3">
+              {value.map((emp) => {
+                return (
+                  <div
+                    key={`${emp.id}-${emp.employeeId}`}
+                    className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
+                  >
+                    {/* Main Info Row */}
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {/* Emp ID */}
+                          <div>
+                            <div className="font-semibold text-[var(--main-color)] text-sm">
+                              {t("fields.employee.id")}
+                            </div>
+                            <div className="text-gray-800">
+                              {emp.employeeId}
+                            </div>
+                          </div>
+
+                          {/* Name */}
+                          <div>
+                            <div className="font-semibold text-[var(--main-color)] text-sm">
+                              {t("fields.employee.name")}
+                            </div>
+                            <div className="text-gray-800">{emp.name}</div>
+                          </div>
+
+                          {/* Position/Role */}
+                          <div>
+                            <div className="font-semibold text-[var(--main-color)] text-sm">
+                              {t("fields.employee.position")}
+                            </div>
+                            <div className="text-gray-800">
+                              {emp.roleOnTask || emp.position || "-"}
+                            </div>
+                          </div>
+
+                          {/* Assigned Date */}
+                          <div>
+                            <div className="font-semibold text-[var(--main-color)] text-sm">
+                              {t("fields.employee.assignedAt") ||
+                                "Assigned Date"}
+                            </div>
+                            <div className="text-gray-800">
+                              {emp.assignedAt
+                                ? new Date(emp.assignedAt).toLocaleDateString()
+                                : "-"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
         case "employees":
           return (
             <div className="flex flex-col gap-3">
               {value.map((emp) => {
                 return (
                   <div
-                    key={crypto.randomUUID()}
+                    key={JSON.stringify(emp)}
                     className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
                   >
                     {/* Main Info Row */}
@@ -772,9 +1137,9 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
                               {t("fields.employee.contactName")}
                             </div>
                             <div className="flex flex-col gap-2">
-                              {emp.contacts.map((contact, contactIndex) => (
+                              {emp.contacts.map((contact) => (
                                 <div
-                                  key={crypto.randomUUID()}
+                                  key={JSON.stringify(contact)}
                                   className="flex justify-between items-center bg-white p-2 rounded border"
                                 >
                                   <div className="flex gap-4">
@@ -819,7 +1184,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           return (
             <div className="flex flex-col gap-3">
               {value.map((file) => {
-                console.log(file);
                 // Function to get file icon based on file type or extension
                 const getFileIcon = (fileName, fileType) => {
                   const extension = fileName?.split(".").pop()?.toLowerCase();
@@ -869,7 +1233,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
                 return (
                   <div
-                    key={crypto.randomUUID()}
+                    key={JSON.stringify(file)}
                     className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
                   >
                     <div className="flex justify-between items-start">
@@ -888,7 +1252,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
                                 {fileIcon}
                               </span>
                               <a
-                                href={`http://192.168.1.105:8080/upload/${
+                                href={`http://loujico.somee.com/Api/upload/${
                                   type === "Emp" ? "Employee" : type
                                 }s/${file.fileName}`}
                                 target="_blank"
@@ -944,13 +1308,342 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
               })}
             </div>
           );
+        case "tasks":
+          const tasksData = value;
+          const tasks = tasksData?.items || [];
+          const totalTasks = tasksData?.totalCount || 0;
+          const totalPages = Math.ceil(totalTasks / tasksPageSize);
+          const startIndex = (tasksPage - 1) * tasksPageSize + 1;
+          const endIndex = Math.min(tasksPage * tasksPageSize, totalTasks);
+
+          return (
+            <div className="space-y-4">
+              {/* Add Task Button (for non-programmers) */}
+              {canManageTasks && (
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => {
+                      if (editTask) {
+                        setEditTask(false);
+                        setTaskDetails({});
+                      }
+
+                      setPopup("task");
+                      setOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-[var(--main-color)] text-white rounded-md hover:bg-[var(--main-color-darker)] transition-colors cursor-pointer"
+                  >
+                    <FaPlus /> {t("detailView.addTask")}
+                  </button>
+                </div>
+              )}
+
+              <div className="flex-1 flex flex-col sm:flex-row gap-3 w-full">
+                {/* Search Input */}
+                <div className="flex-1">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      placeholder={t("detailView.searchTasks")}
+                      className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--main-color)]"
+                    />
+                    <FaSearch className="absolute left-3 top-3 text-gray-400" />
+                  </div>
+                </div>
+
+                {/* Status Filter - for all roles */}
+                <select
+                  value={statusFilter}
+                  onChange={(e) => {
+                    setStatusFilter(e.target.value);
+                    setTasksPage(1);
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--main-color)] bg-white"
+                >
+                  {statusOptions.map((option) => (
+                    <option key={option} value={option === "All" ? "" : option}>
+                      {t(`detailView.statusOption.${option}`)}
+                    </option>
+                  ))}
+                </select>
+
+                {/* My Tasks Toggle - only for programmers */}
+                {isProgrammer && (
+                  <button
+                    onClick={() => {
+                      setMyTasksOnly(!myTasksOnly);
+                      setTasksPage(1);
+                    }}
+                    className={`px-4 py-2 rounded-md transition-colors whitespace-nowrap ${
+                      myTasksOnly
+                        ? "bg-[var(--main-color)] text-white"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                  >
+                    {t("detailView.myTasks")}
+                  </button>
+                )}
+              </div>
+
+              {/* Tasks Loading State */}
+              {loadingTasks ? (
+                <div className="flex justify-center items-center py-12">
+                  <div className="flex space-x-2">
+                    <div className="w-4 h-4 rounded-xs bg-[var(--main-color)] animate-bounce [animation-delay:-0.3s]"></div>
+                    <div className="w-4 h-4 rounded-xs bg-[var(--main-color)] animate-bounce [animation-delay:-0.15s]"></div>
+                    <div className="w-4 h-4 rounded-xs bg-[var(--main-color)] animate-bounce"></div>
+                  </div>
+                </div>
+              ) : tasks.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  {t("detailView.noTasks")}
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {tasks.map((task) => {
+                      // Get status color
+                      const getStatusColor = (status) => {
+                        switch (status?.toLowerCase()) {
+                          case "completed":
+                            return "bg-green-100 text-green-800 border-green-200";
+                          case "inprogress":
+                          case "in progress":
+                            return "bg-blue-100 text-blue-800 border-blue-200";
+                          case "pending":
+                            return "bg-yellow-100 text-yellow-800 border-yellow-200";
+                          case "cancelled":
+                            return "bg-red-100 text-red-800 border-red-200";
+                          default:
+                            return "bg-gray-100 text-gray-800 border-gray-200";
+                        }
+                      };
+
+                      // Get status icon
+                      const getStatusIcon = (status) => {
+                        switch (status?.toLowerCase()) {
+                          case "completed":
+                            return "✅";
+                          case "inprogress":
+                          case "in progress":
+                            return "🔄";
+                          case "pending":
+                            return "⏳";
+                          case "blocked":
+                            return "🚫";
+                          default:
+                            return "📋";
+                        }
+                      };
+
+                      return (
+                        <div
+                          key={JSON.stringify(task)}
+                          className="flex flex-col bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-200"
+                        >
+                          {/* Task Header with Action Buttons */}
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-2 flex-1">
+                              <span className="text-lg">
+                                {getStatusIcon(task.status)}
+                              </span>
+                              <div className="flex-1">
+                                <h3 className="font-bold text-gray-800">
+                                  {task.title || "Untitled Task"}
+                                </h3>
+                              </div>
+                            </div>
+
+                            {/* Task ID and Action Buttons */}
+                            <div className="flex items-center gap-2">
+                              <div className="text-xs text-gray-500 font-mono">
+                                #{task.id}
+                              </div>
+
+                              {/* Action Buttons based on role */}
+                              {isProgrammer ? null : ( // Programmer only sees edit button
+                                // Non-programmers see both edit and delete
+                                <>
+                                  <button
+                                    onClick={() => {
+                                      if (!editTask) {
+                                        setEditTask(true);
+                                      }
+
+                                      getTaskDetails(task.id, false);
+                                      setPopup("task");
+                                      setOpen(true);
+                                    }}
+                                    className="p-1 text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                                    title={t("detailView.editTask")}
+                                  >
+                                    <FaEdit />
+                                  </button>
+                                  <button
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          t("detailView.confirmDelete")
+                                        )
+                                      ) {
+                                        DeleteTask(task.id);
+                                      }
+                                    }}
+                                    className="p-1 text-red-600 hover:text-red-800 transition-colors cursor-pointer"
+                                    title={t("detailView.deleteTask")}
+                                  >
+                                    <FaTrash />
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mt-1">
+                              <div
+                                className={`px-2 py-0.5 outline-none rounded-full text-xs font-medium border ${getStatusColor(
+                                  task.status
+                                )}`}
+                              >
+                                {t(`detailView.statusOption.${task.status}`)}
+                              </div>
+
+                              <div className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                                {t("detailView.estimatedHours", {
+                                  hours: task.estimatedHours || 0,
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Assignees */}
+                          {task.employeeNames &&
+                            task.employeeNames.length > 0 && (
+                              <div className="mt-3 pt-3 border-t border-gray-100">
+                                <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">
+                                  {t("detailView.assignees")}
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {task.employeeNames.map((employee, idx) => (
+                                    <div
+                                      key={idx + employee}
+                                      className="flex items-center gap-2 bg-blue-50 text-blue-700 px-2 py-1 rounded-md text-xs"
+                                    >
+                                      <div className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                                      {employee}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                          {/* Task Metadata */}
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <div className="flex justify-between text-xs text-gray-500">
+                              <div className="flex items-center gap-1">
+                                <span>📅</span>
+                                {task.createdDate ? (
+                                  <span>
+                                    {new Date(
+                                      task.createdDate
+                                    ).toLocaleDateString()}
+                                  </span>
+                                ) : (
+                                  <span>{t("detailView.noDate")}</span>
+                                )}
+                              </div>
+                              {task.lastModified && (
+                                <div className="flex items-center gap-1">
+                                  <span>✏️</span>
+                                  <span>
+                                    {new Date(
+                                      task.lastModified
+                                    ).toLocaleDateString()}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* View Details Button */}
+                              <button
+                                onClick={() => getTaskDetails(task.id, true)}
+                                className="text-sm text-blue-600 hover:text-blue-800 font-medium px-3 py-1 rounded hover:bg-blue-50 cursor-pointer"
+                              >
+                                {t("detailView.viewDetails")}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Pagination for Tasks */}
+                  {totalTasks > 0 && (
+                    <div className="flex justify-center lg:justify-end items-center flex-wrap gap-3 sm:gap-5 mt-5 pt-4 border-t border-gray-200">
+                      <div className="flex items-center gap-2">
+                        <span className="whitespace-nowrap">
+                          {t("dashTable.rowsPerPage")}:
+                        </span>
+                        <select
+                          onChange={(e) =>
+                            handleTasksPageSizeChange(Number(e.target.value))
+                          }
+                          className="outline-none cursor-pointer bg-gray-100 px-2 py-1 rounded"
+                          value={tasksPageSize}
+                          disabled={loadingTasks}
+                        >
+                          <option value="5">5</option>
+                          <option value="10">10</option>
+                          <option value="20">20</option>
+                          <option value="50">50</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center gap-1 dir-ltr">
+                        <span>
+                          {startIndex}-{endIndex}
+                        </span>
+                        <span>{t("dashTable.of")}</span>
+                        <span>{totalTasks}</span>
+                      </div>
+                      <div
+                        className={`flex gap-2 items-center ${
+                          i18n.language === "en" ? "flex-row-reverse" : ""
+                        }`}
+                      >
+                        <button
+                          onClick={() => handleTasksPageChange(tasksPage + 1)}
+                          disabled={tasksPage >= totalPages || loadingTasks}
+                          aria-label={t("dashTable.nextPage")}
+                          className="disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed p-1 hover:bg-gray-200 rounded"
+                        >
+                          <FaAngleRight className="text-lg" />
+                        </button>
+                        <span className="px-2">{tasksPage}</span>
+                        <button
+                          onClick={() => handleTasksPageChange(tasksPage - 1)}
+                          disabled={tasksPage <= 1 || loadingTasks}
+                          aria-label={t("dashTable.previousPage")}
+                          className="disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed p-1 hover:bg-gray-200 rounded"
+                        >
+                          <FaAngleLeft className="text-lg" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          );
         case "contacts":
           return (
             <div className="flex flex-col gap-3">
               {value.map((contact) => {
                 return (
                   <div
-                    key={crypto.randomUUID()}
+                    key={JSON.stringify(contact)}
                     className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
                   >
                     <div className="flex justify-between items-start">
@@ -1024,7 +1717,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
               {value.map((activity) => {
                 return (
                   <div
-                    key={crypto.randomUUID()}
+                    key={JSON.stringify(activity)}
                     className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
                   >
                     <div className="flex justify-between items-start">
@@ -1119,7 +1812,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         case "company":
           return (
             <div className="flex flex-col gap-3">
-              {value.map((company, index) => {
+              {value.map((company) => {
                 const startDate = new Date(
                   company.startDate
                 ).toLocaleDateString();
@@ -1127,7 +1820,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
                 return (
                   <div
-                    key={crypto.randomUUID()}
+                    key={JSON.stringify(company)}
                     className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
                   >
                     <div className="flex justify-between items-start">
@@ -1190,10 +1883,10 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         case "addresses":
           return (
             <div className="flex flex-col gap-3">
-              {value.map((address, index) => {
+              {value.map((address) => {
                 return (
                   <div
-                    key={crypto.randomUUID()}
+                    key={JSON.stringify(address)}
                     className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
                   >
                     <div className="flex justify-between items-start">
@@ -1261,6 +1954,54 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           const dateValue = new Date(value);
           const formattedDate = dateValue.toISOString().split("T")[0];
           return formattedDate;
+        case "status":
+          const getStatusColor = (status) => {
+            switch (status?.toLowerCase()) {
+              case "completed":
+                return "bg-green-100 text-green-800 border-green-200";
+              case "inprogress":
+              case "in progress":
+                return "bg-blue-100 text-blue-800 border-blue-200";
+              case "pending":
+                return "bg-yellow-100 text-yellow-800 border-yellow-200";
+              case "cancelled":
+                return "bg-red-100 text-red-800 border-red-200";
+              default:
+                return "bg-gray-100 text-gray-800 border-gray-200";
+            }
+          };
+
+          const assigned = taskDetails.assignedEmployees.some(
+            (emp) => emp.employeeId == employeeId
+          );
+
+          if (role == "Programmer" && !assigned) {
+            return (
+              <div
+                className={`px-3 w-fit py-0.5 outline-none rounded-full text-xs font-medium border ${getStatusColor(
+                  value.toString()
+                )}`}
+              >
+                {t(`detailView.statusOption.${value.toString()}`)}
+              </div>
+            );
+          }
+
+          return (
+            <select
+              value={value.toString() || "Pending"}
+              onChange={(e) => handleUpdateTaskStatus(+title, e.target.value)}
+              className={`px-2 py-0.5 outline-none rounded-full text-xs font-medium border cursor-pointer ${getStatusColor(
+                value.toString()
+              )}`}
+            >
+              {statusOptions.map((option) => (
+                <option key={option} value={option}>
+                  {t(`detailView.statusOption.${option}`)}
+                </option>
+              ))}
+            </select>
+          );
         default:
           return value.toString();
       }
@@ -1280,10 +2021,22 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         <div className="p-8 rounded-md bg-white">
           <div className="flex justify-between items-center mb-10">
             <h1 className="text-3xl font-bold text-[var(--main-color)]">
-              {t(`detailView.title.${type}`)}
+              {t(`detailView.title.${type}`)}{" "}
+              {title
+                ? i18n.language === "en"
+                  ? "( Task / " + title + " )"
+                  : "( مهمة / " + title + " )"
+                : ""}
             </h1>
             <button
-              onClick={onClose}
+              onClick={() => {
+                if (Object.keys(taskDetails).length && !editTask) {
+                  setTitle(false);
+                  setTaskDetails({});
+                } else {
+                  onClose();
+                }
+              }}
               className="text-gray-500 hover:text-gray-700 cursor-pointer"
             >
               <FaTimes size={24} />
@@ -1293,21 +2046,26 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           {error && (
             <div className="my-4 p-3 bg-red-100 text-red-700 rounded-md">
               {[...error.split(",")].map((e) => (
-                <p key={crypto.randomUUID()}>{e.trim()}</p>
+                <p key={JSON.stringify(e)}>{e.trim()}</p>
               ))}
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {fields.map((field) => {
-              const value = dataToShow[field.name];
+              const value =
+                Object.keys(taskDetails).length && !editTask
+                  ? taskDetails[field.name]
+                  : dataToShow[field.name];
               const isArrayField =
-                (Array.isArray(value) && value.length > 0) ||
-                field.name === "companyDescription";
+                value &&
+                ((Array.isArray(value) && value.length > 0) ||
+                  field.name === "companyDescription" ||
+                  field.name === "tasks");
 
               return (
                 <div
-                  key={crypto.randomUUID()}
+                  key={JSON.stringify(field)}
                   className={`bg-gray-100 p-4 rounded-md shadow-sm ${
                     isArrayField ? "md:col-span-2" : ""
                   }`}
@@ -1324,7 +2082,10 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           </div>
 
           {["Account", "Logs"].includes(type) ? null : (
-            <History id={id} url={type} />
+            <History
+              id={id}
+              url={Object.keys(taskDetails).length && !editTask ? "Task" : type}
+            />
           )}
 
           <div className="flex justify-end gap-3 items-center pt-6 border-t border-gray-200 mt-10">
@@ -1342,9 +2103,9 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
                       field: t("detailView.option"),
                     })}
                   </option>
-                  {options.map((o, i) => {
+                  {options.map((o) => {
                     return (
-                      <option key={crypto.randomUUID()} value={o.toLowerCase()}>
+                      <option key={JSON.stringify(o)} value={o.toLowerCase()}>
                         {t(`detailView.options.${o.toLowerCase()}`)}
                       </option>
                     );
@@ -1363,7 +2124,14 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
               </>
             )}
             <button
-              onClick={onClose}
+              onClick={() => {
+                if (Object.keys(taskDetails).length && !editTask) {
+                  setTitle(false);
+                  setTaskDetails({});
+                } else {
+                  onClose();
+                }
+              }}
               className="px-6 py-2 cursor-pointer bg-[var(--main-color)] text-white rounded-md hover:bg-[var(--main-color-darker)] transition-colors"
             >
               {t("detailView.close")}
@@ -1371,13 +2139,19 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           </div>
         </div>
 
-        {canAdd && (
+        {(canAdd || type === "Project") && (
           <PopUp
             isOpen={open}
             fields={popUpFields}
-            onClose={() => setOpen(false)}
-            isAdd={true}
+            initialData={taskDetails}
+            onClose={() => {
+              setOpen(false);
+              setEditTask(false);
+              setTaskDetails({});
+            }}
+            isAdd={!editTask}
             handleAdd={getHandleAdd()}
+            handleUpdate={EditTask}
             title={t(`detailView.options.${popup}`)}
           />
         )}

@@ -1,22 +1,24 @@
 import DashTable from "./DashTable";
 import { historyFields } from "../fields";
 import { useTranslation } from "react-i18next";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { data } from "react-router-dom";
+import { AuthContext } from "../Context/AuthContext";
 
 const History = ({ url, id }) => {
   const { t } = useTranslation();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const {
+    user: { token, role },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -25,7 +27,7 @@ const History = ({ url, id }) => {
 
         const response = await axios
           .get(
-            `http://192.168.1.105:8080/api/${url}/EditHistory?page=${1}&count=${10}&id=${id}`,
+            `http://loujico.somee.com/Api/${url}/EditHistory?page=${1}&count=${10}&id=${id}`,
             {
               //timeout: 5000,
               headers: {
@@ -45,7 +47,9 @@ const History = ({ url, id }) => {
       }
     };
 
-    fetchData();
+    if (role === "Admin") {
+      fetchData();
+    }
   }, []);
 
   if (!history.length) {

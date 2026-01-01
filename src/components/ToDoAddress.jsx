@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const ToDoAddress = ({ formData, setFormData }) => {
   const { t } = useTranslation();
@@ -15,6 +16,9 @@ const ToDoAddress = ({ formData, setFormData }) => {
   const [selectedCity, setSelectedCity] = useState("");
   const [addressLine, setAddressLine] = useState("");
   const [error, setError] = useState("");
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   const commonProps = {
     className: `px-3 py-2 bg-gray-200 rounded-md transition-colors hover:bg-gray-100 focus:bg-white focus-visible:outline-[var(--main-color)] w-full`,
@@ -25,7 +29,6 @@ const ToDoAddress = ({ formData, setFormData }) => {
     const fetchCountries = async () => {
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -33,7 +36,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
         }
 
         const response = await axios
-          .get("http://192.168.1.105:8080/api/Location/GetAllCountry", {
+          .get("http://loujico.somee.com/Api/Location/GetAllCountry", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -62,7 +65,6 @@ const ToDoAddress = ({ formData, setFormData }) => {
 
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -71,7 +73,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
 
         const response = await axios
           .get(
-            `http://192.168.1.105:8080/api/Location/GetStateByCountry/${selectedCountry}`,
+            `http://loujico.somee.com/Api/Location/GetStateByCountry/${selectedCountry}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -115,7 +117,6 @@ const ToDoAddress = ({ formData, setFormData }) => {
 
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -124,7 +125,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
 
         const response = await axios
           .get(
-            `http://192.168.1.105:8080/api/Location/GetCityByState/${selectedState}`,
+            `http://loujico.somee.com/Api/Location/GetCityByState/${selectedState}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -227,7 +228,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
             >
               <option value="">{t("todoAddress.chooseCountry")}</option>
               {countries.map((country) => (
-                <option key={crypto.randomUUID()} value={country.id}>
+                <option key={JSON.stringify(country)} value={country.id}>
                   {country.name}
                 </option>
               ))}
@@ -247,7 +248,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
             >
               <option value="">{t("todoAddress.chooseState")}</option>
               {states.map((state) => (
-                <option key={crypto.randomUUID()} value={state.id}>
+                <option key={JSON.stringify(state)} value={state.id}>
                   {state.name}
                 </option>
               ))}
@@ -269,7 +270,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
             >
               <option value="">{t("todoAddress.chooseCity")}</option>
               {cities.map((city) => (
-                <option key={crypto.randomUUID()} value={city.id}>
+                <option key={JSON.stringify(city)} value={city.id}>
                   {city.name}
                 </option>
               ))}
@@ -307,7 +308,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
         {(formData.addresses || []).map((address, index) => {
           return (
             <div
-              key={crypto.randomUUID()}
+              key={JSON.stringify(address)}
               className="flex justify-between items-center bg-gray-200 p-2 rounded-md"
             >
               <span>

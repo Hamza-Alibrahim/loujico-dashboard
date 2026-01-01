@@ -1,13 +1,14 @@
-import { useState, useEffect, useCallback, useRef } from "react";
-import { FaAngleRight, FaAngleLeft, FaTrash } from "react-icons/fa";
+import { useState, useEffect, useRef, useContext } from "react";
+import { FaAngleRight, FaAngleLeft } from "react-icons/fa";
 import PopUp from "./PopUp";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
 import DetailView from "./DetailView";
 import { FaSearch } from "react-icons/fa";
+import { AuthContext } from "../Context/AuthContext";
 
 // API base URL should be configured globally, not hardcoded
-const API_BASE_URL = "http://192.168.1.105:8080";
+const API_BASE_URL = "http://loujico.somee.com/Api";
 
 const DashTable = ({
   title,
@@ -43,7 +44,9 @@ const DashTable = ({
   const [hoveredTh, setHoveredTh] = useState(null);
   const [thPosition, setThPosition] = useState({});
   const tableRef = useRef(null);
-  const token = localStorage.getItem("authToken");
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   // Calculate pagination values
   const totalItems = total || data.length;
@@ -179,7 +182,7 @@ const DashTable = ({
     setError(null);
     try {
       const response = await axios
-        .get(`${API_BASE_URL}/api${url}/GetById/${checkedFields[0]}`, {
+        .get(`${API_BASE_URL}${url}/GetById/${checkedFields[0]}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -216,7 +219,7 @@ const DashTable = ({
 
       if (url === "/Location") {
         const response = await axios.post(
-          `${API_BASE_URL}/api${url}/Add${name}${body.id ? "/" + body.id : ""}`,
+          `${API_BASE_URL}${url}/Add${name}${body.id ? "/" + body.id : ""}`,
           formData,
           {
             headers: {
@@ -234,7 +237,7 @@ const DashTable = ({
         return response.data;
       } else {
         const response = await axios.post(
-          `${API_BASE_URL}/api${url}/Add${
+          `${API_BASE_URL}${url}/Add${
             url === "/Settings" || url === "/Company" ? name : ""
           }`,
           formData,
@@ -278,7 +281,7 @@ const DashTable = ({
       const formData = convertToFormData(body);
 
       const response = await axios.patch(
-        `${API_BASE_URL}/api${url}/Edit${
+        `${API_BASE_URL}${url}/Edit${
           url === "/Settings" || url === "/Company" ? name : ""
         }`,
         formData,
@@ -316,7 +319,7 @@ const DashTable = ({
       if (url === "/Location") {
         await Promise.all(
           fieldsToDelete.map((fieldId) =>
-            axios.delete(`${API_BASE_URL}/api${url}/Delete${name}/${fieldId}`, {
+            axios.delete(`${API_BASE_URL}${url}/Delete${name}/${fieldId}`, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
@@ -328,7 +331,7 @@ const DashTable = ({
         await Promise.all(
           fieldsToDelete.map((fieldId) =>
             axios.delete(
-              `${API_BASE_URL}/api${url}/Delete${
+              `${API_BASE_URL}${url}/Delete${
                 url === "/Settings" ? name : ""
               }/${fieldId}`,
               {
@@ -439,7 +442,7 @@ const DashTable = ({
             {error && (
               <div className="mt-4 p-3 bg-red-100 text-red-700 rounded-md">
                 {[...error.split(",")].map((e) => (
-                  <p key={crypto.randomUUID()}>{e.trim()}</p>
+                  <p key={JSON.stringify(e)}>{e.trim()}</p>
                 ))}
               </div>
             )}
@@ -543,7 +546,7 @@ const DashTable = ({
                     )}
                     {fields.map((field) => (
                       <th
-                        key={crypto.randomUUID()}
+                        key={JSON.stringify(field)}
                         className={`h-12 relative group bg-[var(--main-color)] text-white border-white font-semibold ${
                           language === "ar"
                             ? "last:rounded-tl-md last:border-0 first:rounded-tr-md border-l"
@@ -584,7 +587,7 @@ const DashTable = ({
                       {currentData.length > 0 ? (
                         currentData.map((dataItem) => (
                           <tr
-                            key={crypto.randomUUID()}
+                            key={JSON.stringify(dataItem)}
                             className="transition-colors hover:bg-gray-300"
                             onClick={() => {
                               setSelectedId(dataItem.id || dataItem.userid);
@@ -618,7 +621,7 @@ const DashTable = ({
                             )}
                             {fields.map((field) => (
                               <td
-                                key={crypto.randomUUID()}
+                                key={JSON.stringify(field)}
                                 className={`p-2 border-b border-l ${
                                   url === "/History"
                                     ? "first:border-l-0 border-l"
@@ -740,18 +743,18 @@ const DashTable = ({
                   onClick={() => handlePageChange(page + 1)}
                   disabled={page >= totalPages || isLoading}
                   aria-label={t("dashTable.nextPage")}
-                  className="disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <FaAngleRight className="cursor-pointer" />
+                  <FaAngleRight />
                 </button>
                 <span>{page}</span>
                 <button
                   onClick={() => handlePageChange(page - 1)}
                   disabled={page <= 1 || isLoading}
                   aria-label={t("dashTable.previousPage")}
-                  className="disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <FaAngleLeft className="cursor-pointer" />
+                  <FaAngleLeft />
                 </button>
               </div>
             </div>

@@ -2,8 +2,9 @@ import DashTable from "./DashTable";
 import { countryFields } from "../fields";
 import { countryFields as popUpFields } from "../popUpFields";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { AuthContext } from "../Context/AuthContext";
 
 const Countries = () => {
   const { t } = useTranslation();
@@ -14,13 +15,15 @@ const Countries = () => {
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(10);
   const [search, setSearch] = useState("");
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -28,7 +31,7 @@ const Countries = () => {
         }
 
         const response = await axios
-          .get(`http://192.168.1.105:8080/api/Location/GetAllCountry`, {
+          .get(`http://loujico.somee.com/Api/Location/GetAllCountry`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

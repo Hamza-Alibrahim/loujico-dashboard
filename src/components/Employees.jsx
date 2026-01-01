@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import DashTable from "./DashTable";
 import { employeeFields as popUpFields } from "../popUpFields";
 import { employeeFields } from "../fields";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../Context/AuthContext";
 
 const Employees = () => {
   const { t } = useTranslation();
@@ -16,13 +17,15 @@ const Employees = () => {
   const [count, setCount] = useState(10);
   const [search, setSearch] = useState("");
   const [total, setTotal] = useState(0);
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -32,7 +35,7 @@ const Employees = () => {
         if (search) {
           const response = await axios
             .get(
-              `http://192.168.1.105:8080/api/Emp/Search?page=${page}&count=${count}&name=${search}`,
+              `http://loujico.somee.com/Api/Emp/Search?page=${page}&count=${count}&name=${search}`,
               {
                 // //timeout: 5000,
                 headers: {
@@ -47,7 +50,7 @@ const Employees = () => {
         } else {
           const response = await axios
             .get(
-              `http://192.168.1.105:8080/api/Emp/GetAll?page=${page}&count=${count}`,
+              `http://loujico.somee.com/Api/Emp/GetAll?page=${page}&count=${count}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -76,15 +79,13 @@ const Employees = () => {
   useEffect(() => {
     const fetchCount = async () => {
       try {
-        const token = localStorage.getItem("authToken");
-
         if (!token) {
           setError("Authentication token not found");
           return;
         }
 
         const response = await axios
-          .get(`http://192.168.1.105:8080/api/Emp/GetCount`, {
+          .get(`http://loujico.somee.com/Api/Emp/GetCount`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

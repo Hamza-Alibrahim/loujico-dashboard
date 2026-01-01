@@ -175,6 +175,9 @@ export const projectDetailFields = [
   // { name: "status", title: "fields.project.status" },
   { name: "employees", title: "fields.common.employees" },
   { name: "files", title: "fields.common.files" },
+  { name: "tasks", title: "fields.common.tasks" },
+  { name: "createdAt", title: "fields.common.createdAt" },
+  { name: "updatedAt", title: "fields.common.updatedAt" },
 ];
 export const productDetailFields = [
   { name: "id", title: "fields.product.id" },
@@ -239,6 +242,40 @@ export const userFields = [
     title: "fields.user.role",
   },
 ];
+
+export const taskFields = [
+  {
+    name: "id",
+    title: "fields.task.id",
+  },
+  {
+    name: "title",
+    title: "fields.task.title",
+  },
+  {
+    name: "status",
+    title: "fields.project.status",
+  },
+  {
+    name: "estimatedHours",
+    title: "fields.task.estimatedHours",
+  },
+  {
+    name: "description",
+    title: "fields.employee.description",
+  },
+  {
+    name: "assignedEmployees",
+    title: "fields.task.assignedEmployees",
+  },
+  {
+    name: "files",
+    title: "fields.common.files",
+  },
+  { name: "createdAt", title: "fields.common.createdAt" },
+  { name: "updatedAt", title: "fields.common.updatedAt" },
+]
+
 // دالة مساعدة للحصول على الحقول المناسبة
 export const getDetailFields = (type) => {
   switch (type) {
@@ -258,6 +295,8 @@ export const getDetailFields = (type) => {
       return logFields;
     case "Account":
       return userFields;
+    case "Task":
+      return taskFields;
     default:
       return [];
   }

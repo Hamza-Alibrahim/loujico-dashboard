@@ -1,6 +1,7 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { AuthContext } from "../Context/AuthContext";
 
 const Select = ({
   field,
@@ -15,12 +16,14 @@ const Select = ({
   const [data, setData] = useState([]);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState({});
+  const {
+    user: { token },
+  } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchDta = async () => {
       try {
         setError(null);
-        const token = localStorage.getItem("authToken");
 
         if (!token) {
           setError("Authentication token not found");
@@ -214,13 +217,13 @@ const Select = ({
       )}
       {data.map((e) => {
         return (
-          <option key={crypto.randomUUID()} value={`${e.id}`}>
-            {e.title || e.customerName || e.legalInfo || e.name}
+          <option key={JSON.stringify(e)} value={`${e.id || e.userid}`}>
+            {e.title || e.customerName || e.legalInfo || e.name || e.username}
           </option>
         );
       })}
       {field.options?.map((option) => (
-        <option key={crypto.randomUUID()} value={option.value}>
+        <option key={JSON.stringify(option)} value={option.value}>
           {t(option.label)}
         </option>
       ))}
