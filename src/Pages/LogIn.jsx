@@ -17,9 +17,6 @@ const Login = () => {
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
   const [show, setShow] = useState(false);
-  const {
-    user: { role },
-  } = useContext(AuthContext);
 
   // 2. دالة التعامل مع عملية تسجيل الدخول
   const handleLogin = async (e) => {
@@ -51,7 +48,6 @@ const Login = () => {
       // 4. معالجة بيانات الاستجابة
       // الـ API يجب أن يعيد object يحتوي على token وبيانات المستخدم
       const { data: token } = response.data;
-      localStorage.setItem("authToken", token);
       const decoded = jwtDecode(token);
       const role =
         decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
