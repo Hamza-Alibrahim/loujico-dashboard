@@ -123,7 +123,8 @@
     "chooseFile": "Choose File :",
     "noFileChosen": "No file chosen",
     "fileTypePlaceholder": "File Type",
-    "addButton": "Add File"
+    "addButton": "Add File",
+    "loading": "Loading..."
   },
   "todoAddress": {
     "associatedAddresses": "Addresses",

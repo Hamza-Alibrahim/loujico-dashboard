@@ -35,6 +35,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
   const [statusFilter, setStatusFilter] = useState("");
   const [taskDetails, setTaskDetails] = useState({});
   const [title, setTitle] = useState(false);
+  const [clicked, setClicked] = useState(false);
   const {
     user: { token, role, employeeId },
   } = useContext(AuthContext);
@@ -637,6 +638,8 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.error("Add file error:", errorMessage);
       setError(errorMessage);
       throw new Error(errorMessage);
+    } finally {
+      setClicked(false);
     }
   };
 
@@ -776,8 +779,9 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
             return emp.employeeId !== employeeId || emp.roleOnProject !== role;
           }),
         };
-        const formData = convertToFormData(newdata);
         console.log(newdata);
+
+        const formData = convertToFormData(newdata);
         const response = await axios.patch(
           `http://loujico.somee.com/Api/${type}/Edit`,
           formData,
@@ -1235,6 +1239,8 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
                   url={"Task"}
                   forProgrammer={true}
                   AddFile={AddTaskFile}
+                  clicked={clicked}
+                  setClicked={setClicked}
                 />
               ) : null}
               <div className="flex flex-col gap-3">

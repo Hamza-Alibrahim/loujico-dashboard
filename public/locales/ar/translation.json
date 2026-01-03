@@ -123,7 +123,8 @@
     "chooseFile": "اختر ملف :",
     "noFileChosen": "لم يتم اختيار ملف",
     "fileTypePlaceholder": "نوع الملف",
-    "addButton": "إضافة"
+    "addButton": "إضافة",
+    "loading": "جاري التحميل..."
   },
   "todoAddress": {
     "associatedAddresses": "العناوين المرتبطة",

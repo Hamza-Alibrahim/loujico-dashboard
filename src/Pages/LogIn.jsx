@@ -50,8 +50,6 @@ const Login = () => {
         decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"];
       const employeeId = decoded.EmployeeId;
 
-      console.log(decoded);
-
       login({ username, role, employeeId, token });
 
       if (role === "Admin") {

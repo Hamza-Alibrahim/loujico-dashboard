@@ -10,6 +10,8 @@ const ToDoFile = ({
   url,
   forProgrammer = false,
   AddFile = () => {},
+  clicked = false,
+  setClicked = () => {},
 }) => {
   const {
     t,
@@ -27,13 +29,16 @@ const ToDoFile = ({
 
   // Check if add button should be disabled
   const isAddButtonDisabled = () => {
-    return !data.files || !data.fileType;
+    return !data.files || !data.fileType || clicked;
   };
 
   const handleAddFile = () => {
     if (forProgrammer) {
-      const Data = { Data: [data] };
-      AddFile(Data);
+      if (!clicked) {
+        setClicked(true);
+        const Data = { Data: [data] };
+        AddFile(Data);
+      }
     } else {
       if (data.files && data.fileType) {
         setFormData({
@@ -121,9 +126,9 @@ const ToDoFile = ({
         type="button"
         onClick={handleAddFile}
         disabled={isAddButtonDisabled()}
-        className="px-4 py-2 text-white bg-[var(--main-color)] rounded-md hover:bg-[var(--main-color-darker)] cursor-pointer transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+        className={`px-4 py-2 text-white bg-[var(--main-color)] rounded-md hover:bg-[var(--main-color-darker)] cursor-pointer transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed`}
       >
-        {t("todoFile.addButton")}
+        {!clicked ? t("todoFile.addButton") : t("todoFile.loading")}
       </button>
       <div className="flex flex-col gap-2 mt-2">
         {(formData.Data || []).map((file, i) => {
