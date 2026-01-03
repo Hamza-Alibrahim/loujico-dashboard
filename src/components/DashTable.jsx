@@ -45,7 +45,7 @@ const DashTable = ({
   const [thPosition, setThPosition] = useState({});
   const tableRef = useRef(null);
   const {
-    user: { token },
+    user: { token, role },
   } = useContext(AuthContext);
 
   // Calculate pagination values
@@ -488,32 +488,34 @@ const DashTable = ({
                         />
                       </div>
                     )}
-                    <div
-                      className={`flex flex-wrap gap-3 max-lg:justify-center`}
-                    >
-                      <button
-                        onClick={handleAddClick}
-                        className="px-2 w-24 sm:px-5 sm:w-32 py-2 cursor-pointer rounded-md bg-[var(--main-color)]  text-white font-bold duration-300"
+                    {role === "Admin" ? (
+                      <div
+                        className={`flex flex-wrap gap-3 max-lg:justify-center`}
                       >
-                        {t("dashTable.buttons.add")}
-                      </button>
-                      {["/Location", "/Settings"].includes(url) ? null : (
                         <button
-                          onClick={handleEditClick}
-                          disabled={checkedFields.length !== 1 || isLoading}
-                          className={`px-2 w-24 sm:px-5 sm:w-32 py-2 rounded-md cursor-pointer bg-[var(--sub-color)] text-white font-bold duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+                          onClick={handleAddClick}
+                          className="px-2 w-24 sm:px-5 sm:w-32 py-2 cursor-pointer rounded-md bg-[var(--main-color)]  text-white font-bold duration-300"
                         >
-                          {t("dashTable.buttons.edit")}
+                          {t("dashTable.buttons.add")}
                         </button>
-                      )}
-                      <button
-                        onClick={() => handleDelete(checkedFields)}
-                        disabled={checkedFields.length === 0 || isLoading}
-                        className={`px-2 w-24 sm:px-5 sm:w-32 py-2 rounded-md cursor-pointer bg-gray-600 text-white font-bold duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
-                      >
-                        {t("dashTable.buttons.delete")}
-                      </button>
-                    </div>
+                        {["/Location", "/Settings"].includes(url) ? null : (
+                          <button
+                            onClick={handleEditClick}
+                            disabled={checkedFields.length !== 1 || isLoading}
+                            className={`px-2 w-24 sm:px-5 sm:w-32 py-2 rounded-md cursor-pointer bg-[var(--sub-color)] text-white font-bold duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            {t("dashTable.buttons.edit")}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => handleDelete(checkedFields)}
+                          disabled={checkedFields.length === 0 || isLoading}
+                          className={`px-2 w-24 sm:px-5 sm:w-32 py-2 rounded-md cursor-pointer bg-gray-600 text-white font-bold duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          {t("dashTable.buttons.delete")}
+                        </button>
+                      </div>
+                    ) : null}
                   </>
                 )}
               </div>
@@ -523,7 +525,7 @@ const DashTable = ({
               <table className="w-full border-collapse text-center bg-[#eaecf0] rounded-md">
                 <thead>
                   <tr>
-                    {url === "/History" ? null : (
+                    {url === "/History" || role !== "Admin" ? null : (
                       <th
                         className={`h-12 bg-[var(--main-color)] text-[var(--main-color)] border-white font-semibold ${
                           language === "ar"
@@ -596,7 +598,7 @@ const DashTable = ({
                               }
                             }}
                           >
-                            {url === "/History" ? null : (
+                            {url === "/History" || role !== "Admin" ? null : (
                               <td
                                 onClick={(e) => {
                                   e.stopPropagation();

@@ -4,7 +4,13 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { AuthContext } from "../Context/AuthContext";
 
-const ToDoFile = ({ formData, setFormData, url }) => {
+const ToDoFile = ({
+  formData = {},
+  setFormData = () => {},
+  url,
+  forProgrammer = false,
+  AddFile = () => {},
+}) => {
   const {
     t,
     i18n: { language },
@@ -25,13 +31,18 @@ const ToDoFile = ({ formData, setFormData, url }) => {
   };
 
   const handleAddFile = () => {
-    if (data.files && data.fileType) {
-      setFormData({
-        ...formData,
-        Data: [...(formData.Data || []), data],
-      });
-      setData({});
-      fileInputRef.current.value = "";
+    if (forProgrammer) {
+      const Data = { Data: [data] };
+      AddFile(Data);
+    } else {
+      if (data.files && data.fileType) {
+        setFormData({
+          ...formData,
+          Data: [...(formData.Data || []), data],
+        });
+        setData({});
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -74,8 +85,10 @@ const ToDoFile = ({ formData, setFormData, url }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-sm font-medium">{t("todoFile.associatedFiles")}</h1>
+    <div className="flex flex-col gap-2 mb-5">
+      {!forProgrammer ? (
+        <h1 className="text-sm font-medium">{t("todoFile.associatedFiles")}</h1>
+      ) : null}
       <div className="flex items-center flex-col sm:flex-row gap-2 sm:gap-4">
         <div className="relative flex items-baseline w-full gap-2">
           <input

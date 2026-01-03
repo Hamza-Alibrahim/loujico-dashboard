@@ -1,4 +1,20 @@
 {
+  "login": {
+    "title": "Sign in to your account",
+    "emailLabel": "Email address",
+    "passwordLabel": "Password",
+    "forgotPassword": "Forgot your password?",
+    "signIn": "Sign In",
+    "signingIn": "Signing in...",
+    "errors": {
+      "emptyFields": "Please enter your Email and Password.",
+      "apiError": "An error occurred during login. Please try again."
+    },
+    "placeholders": {
+      "email": "Enter your email",
+      "password": "Enter your password"
+    }
+  },
   "sideBar": {
     "dashboard": "Dashboard",
     "users": "Users",
@@ -20,7 +36,8 @@
     "locations": "Locations",
     "countries": "Countries",
     "states": "States",
-    "cities": "Cities"
+    "cities": "Cities",
+    "logout": "Log Out"
   },
   "home": {
     "dashboard": "Dashboard",

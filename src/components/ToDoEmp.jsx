@@ -29,12 +29,17 @@ const ToDoEmp = ({ formData, setFormData, required }) => {
         }
 
         const response = await axios
-          .get("http://loujico.somee.com/Api/Emp/GetAllId", {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          })
+          .get(
+            `http://loujico.somee.com/Api/Emp/GetAllId${
+              required ? "?userid=true" : ""
+            }`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
           .then((res) => res.data);
 
         setEmployees(response.data);

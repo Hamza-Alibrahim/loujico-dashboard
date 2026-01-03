@@ -1,7 +1,7 @@
 // src/components/SideBar.jsx
 import { useContext, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   FaUserAlt,
   FaProjectDiagram,
@@ -15,6 +15,7 @@ import {
   FaGlobeAmericas,
   FaMap,
   FaCity,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { AiFillProduct } from "react-icons/ai";
 import { HiDocumentText } from "react-icons/hi";
@@ -31,7 +32,9 @@ const SideBar = ({ isOpen, onClose }) => {
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
   const {
     user: { role },
+    logout,
   } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const toggleAccordion = (accordionName) => {
     setOpenAccordions((prev) => ({
@@ -42,6 +45,17 @@ const SideBar = ({ isOpen, onClose }) => {
 
   const toggleLanguageDropdown = () => {
     setShowLanguageDropdown(!showLanguageDropdown);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    logout();
+
+    navigate("/");
+
+    if (onClose) {
+      onClose();
+    }
   };
 
   const isRTL = language === "ar";
@@ -261,7 +275,7 @@ const SideBar = ({ isOpen, onClose }) => {
       className={`
         side-bar w-[260px] min-h-screen h-full flex flex-col items-center
         bg-white transform transition-transform duration-300 ease-in-out
-        fixed top-0 z-50 lg:relative lg:translate-x-0 shrink-0
+        fixed top-0 overflow-y-scroll z-50 lg:relative lg:translate-x-0 shrink-0
         ${isRTL ? "right-0" : "left-0"}
         ${
           isOpen
@@ -272,15 +286,11 @@ const SideBar = ({ isOpen, onClose }) => {
         }
       `}
     >
-      <div
-        className={`flex justify-between items-center w-full pt-10 lg:hidden gap-10 px-5 ${
-          isRTL ? "" : "flex-row-reverse"
-        }`}
-      >
+      <div className={`flex items-center w-full pt-10 lg:hidden gap-2 px-5`}>
         <img
           src="/public/assets/image/logo.png"
           alt={t("logoAlt")}
-          className="w-[150px] mt-2"
+          className="w-[150px] mt-2 flex-1"
         />
         <button
           onClick={onClose}
@@ -296,7 +306,7 @@ const SideBar = ({ isOpen, onClose }) => {
         className="w-[200px] my-2 mb-10 hidden lg:block"
       />
 
-      <ul className="w-full">
+      <ul className="w-full flex-1">
         {sideBarItems.map((item, index) => {
           if (role === "Admin") {
             if (item.type === "accordion") {
@@ -394,6 +404,22 @@ const SideBar = ({ isOpen, onClose }) => {
           </div>
         </li>
       </ul>
+
+      {/* Logout Button - Added as the last child of the sidebar */}
+      <div className="w-full p-4">
+        <button
+          onClick={handleLogout}
+          className={`
+            flex items-center justify-center w-full py-3 px-10
+            duration-300 font-bold rounded-md
+            bg-red-500 hover:bg-red-600 active:bg-red-700
+            text-white cursor-pointer gap-2 
+          `}
+        >
+          <span>{t("sideBar.logout") || "Logout"}</span>
+          <FaSignOutAlt className={`${isRTL ? "rotate-y-180" : ""}`} />
+        </button>
+      </div>
     </div>
   );
 };

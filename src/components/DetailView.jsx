@@ -15,6 +15,7 @@ import History from "./History";
 import PopUp from "./PopUp";
 import { addCompanyFields } from "../popUpFields";
 import { AuthContext } from "../Context/AuthContext";
+import ToDoFile from "./ToDoFile";
 
 const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
   const [data, setData] = useState(null);
@@ -605,6 +606,40 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     }
   };
 
+  const AddTaskFile = async (body) => {
+    setError(null);
+    if (!token) {
+      setError("Authentication token not found");
+      return;
+    }
+
+    try {
+      console.log(body);
+      const data = convertToFormData(body);
+
+      const response = await axios.post(
+        `http://loujico.somee.com/Api/Task/AddFile?id=${taskDetails.id}`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      getTaskDetails(taskDetails.id, true);
+      return response.data;
+    } catch (err) {
+      const errorMessage = handleApiError(
+        err,
+        t("detailView.errors.addFailed")
+      );
+      console.error("Add file error:", errorMessage);
+      setError(errorMessage);
+      throw new Error(errorMessage);
+    }
+  };
+
   // DELETE FUNCTIONS (PATCH requests)
   const DeleteContact = async (contactId) => {
     setError(null);
@@ -867,10 +902,12 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       return;
     }
 
+    const forTask = Object.keys(taskDetails).length && !editTask;
+
     try {
       const response = await axios.delete(
         `http://loujico.somee.com/Api/${
-          Object.keys(taskDetails).length && !editTask ? "Task" : type
+          forTask ? "Task" : type
         }/DeleteFile/${fileId}`,
         {
           headers: {
@@ -880,7 +917,11 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         }
       );
 
-      setRefresh((prev) => !prev);
+      if (forTask) {
+        getTaskDetails(taskDetails.id, true);
+      } else {
+        setRefresh((prev) => !prev);
+      }
       return response.data;
     } catch (err) {
       const errorMessage = handleApiError(
@@ -997,6 +1038,12 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     // Check if this field should be full width (array fields)
     const shouldBeFullWidth = Array.isArray(value) && value.length > 0;
+    const assigned =
+      taskDetails && taskDetails.assignedEmployees
+        ? taskDetails.assignedEmployees.some(
+            (emp) => emp.employeeId == employeeId
+          )
+        : [];
 
     const content = (() => {
       switch (field.name) {
@@ -1182,131 +1229,144 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           );
         case "files":
           return (
-            <div className="flex flex-col gap-3">
-              {value.map((file) => {
-                // Function to get file icon based on file type or extension
-                const getFileIcon = (fileName, fileType) => {
-                  const extension = fileName?.split(".").pop()?.toLowerCase();
-                  const type = fileType?.toLowerCase();
+            <>
+              {role !== "Programmer" || assigned ? (
+                <ToDoFile
+                  url={"Task"}
+                  forProgrammer={true}
+                  AddFile={AddTaskFile}
+                />
+              ) : null}
+              <div className="flex flex-col gap-3">
+                {value.map((file) => {
+                  // Function to get file icon based on file type or extension
+                  const getFileIcon = (fileName, fileType) => {
+                    const extension = fileName?.split(".").pop()?.toLowerCase();
+                    const type = fileType?.toLowerCase();
 
-                  if (type?.includes("pdf") || extension === "pdf") {
-                    return "📄"; // PDF icon
-                  } else if (
-                    type?.includes("image") ||
-                    ["jpg", "jpeg", "png", "gif", "bmp", "svg"].includes(
-                      extension
-                    )
-                  ) {
-                    return "🖼️"; // Image icon
-                  } else if (
-                    type?.includes("word") ||
-                    extension === "doc" ||
-                    extension === "docx"
-                  ) {
-                    return "📝"; // Word document icon
-                  } else if (
-                    type?.includes("excel") ||
-                    extension === "xls" ||
-                    extension === "xlsx"
-                  ) {
-                    return "📊"; // Excel icon
-                  } else if (
-                    type?.includes("powerpoint") ||
-                    extension === "ppt" ||
-                    extension === "pptx"
-                  ) {
-                    return "📽️"; // PowerPoint icon
-                  } else if (
-                    type?.includes("zip") ||
-                    extension === "zip" ||
-                    extension === "rar"
-                  ) {
-                    return "📦"; // Archive icon
-                  } else if (type?.includes("text") || extension === "txt") {
-                    return "📃"; // Text file icon
-                  } else {
-                    return "📎"; // Default file icon
-                  }
-                };
+                    if (type?.includes("pdf") || extension === "pdf") {
+                      return "📄"; // PDF icon
+                    } else if (
+                      type?.includes("image") ||
+                      ["jpg", "jpeg", "png", "gif", "bmp", "svg"].includes(
+                        extension
+                      )
+                    ) {
+                      return "🖼️"; // Image icon
+                    } else if (
+                      type?.includes("word") ||
+                      extension === "doc" ||
+                      extension === "docx"
+                    ) {
+                      return "📝"; // Word document icon
+                    } else if (
+                      type?.includes("excel") ||
+                      extension === "xls" ||
+                      extension === "xlsx"
+                    ) {
+                      return "📊"; // Excel icon
+                    } else if (
+                      type?.includes("powerpoint") ||
+                      extension === "ppt" ||
+                      extension === "pptx"
+                    ) {
+                      return "📽️"; // PowerPoint icon
+                    } else if (
+                      type?.includes("zip") ||
+                      extension === "zip" ||
+                      extension === "rar"
+                    ) {
+                      return "📦"; // Archive icon
+                    } else if (type?.includes("text") || extension === "txt") {
+                      return "📃"; // Text file icon
+                    } else {
+                      return "📎"; // Default file icon
+                    }
+                  };
 
-                const fileIcon = getFileIcon(file.fileName, file.fileType);
+                  const fileIcon = getFileIcon(file.fileName, file.fileType);
 
-                return (
-                  <div
-                    key={JSON.stringify(file)}
-                    className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {/* File Name with Icon */}
-                          <div className="md:col-span-2">
-                            <div className="font-semibold text-[var(--main-color)] text-sm mb-2">
-                              {t("fields.file.fileName")}
+                  return (
+                    <div
+                      key={JSON.stringify(file)}
+                      className="flex flex-col gap-3 bg-gray-100 border border-gray-300 rounded-md p-4"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* File Name with Icon */}
+                            <div className="md:col-span-2">
+                              <div className="font-semibold text-[var(--main-color)] text-sm mb-2">
+                                {t("fields.file.fileName")}
+                              </div>
+                              <div className="flex items-center gap-3">
+                                <span
+                                  className="text-2xl"
+                                  title={file.fileType || "File"}
+                                >
+                                  {fileIcon}
+                                </span>
+                                <a
+                                  href={`http://loujico.somee.com/Api/upload/${
+                                    type === "Emp" ? "Employee" : type
+                                  }s/${file.fileName}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:text-blue-800 underline break-words flex-1"
+                                  title={`Download ${file.fileName}`}
+                                >
+                                  {file.fileName}
+                                </a>
+                              </div>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <span
-                                className="text-2xl"
-                                title={file.fileType || "File"}
-                              >
-                                {fileIcon}
-                              </span>
-                              <a
-                                href={`http://loujico.somee.com/Api/upload/${
-                                  type === "Emp" ? "Employee" : type
-                                }s/${file.fileName}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 underline break-words flex-1"
-                                title={`Download ${file.fileName}`}
-                              >
-                                {file.fileName}
-                              </a>
-                            </div>
+
+                            {/* File Type */}
+                            {file.fileType && (
+                              <div>
+                                <div className="font-semibold text-[var(--main-color)] text-sm">
+                                  {t("fields.file.fileType")}
+                                </div>
+                                <div className="text-gray-800 flex items-center gap-2">
+                                  <span className="text-lg">{fileIcon}</span>
+                                  {file.fileType}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Upload Date */}
+                            {file.uploadedAt && (
+                              <div>
+                                <div className="font-semibold text-[var(--main-color)] text-sm">
+                                  {t("fields.file.uploadedAt")}
+                                </div>
+                                <div className="text-gray-800">
+                                  {new Date(
+                                    file.uploadedAt
+                                  ).toLocaleDateString()}
+                                </div>
+                              </div>
+                            )}
                           </div>
-
-                          {/* File Type */}
-                          {file.fileType && (
-                            <div>
-                              <div className="font-semibold text-[var(--main-color)] text-sm">
-                                {t("fields.file.fileType")}
-                              </div>
-                              <div className="text-gray-800 flex items-center gap-2">
-                                <span className="text-lg">{fileIcon}</span>
-                                {file.fileType}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Upload Date */}
-                          {file.uploadedAt && (
-                            <div>
-                              <div className="font-semibold text-[var(--main-color)] text-sm">
-                                {t("fields.file.uploadedAt")}
-                              </div>
-                              <div className="text-gray-800">
-                                {new Date(file.uploadedAt).toLocaleDateString()}
-                              </div>
-                            </div>
-                          )}
                         </div>
-                      </div>
 
-                      {/* Delete Button */}
-                      <div className="flex-shrink-0 ml-4">
-                        <FaTrash
-                          onClick={() =>
-                            handleDeleteFile(file.id || file.entityId)
-                          }
-                          className="hover:text-red-500 transition-colors cursor-pointer mt-1"
-                          title={t("detailView.confirmDelete")}
-                        />
+                        {/* Delete Button */}
+                        {role !== "Programmer" || assigned ? (
+                          <div className="flex-shrink-0 ml-4">
+                            <FaTrash
+                              onClick={() =>
+                                handleDeleteFile(file.id || file.entityId)
+                              }
+                              className="hover:text-red-500 transition-colors cursor-pointer mt-1"
+                              title={t("detailView.confirmDelete")}
+                            />
+                          </div>
+                        ) : null}
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            </>
           );
         case "tasks":
           const tasksData = value;
@@ -1970,10 +2030,6 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
                 return "bg-gray-100 text-gray-800 border-gray-200";
             }
           };
-
-          const assigned = taskDetails.assignedEmployees.some(
-            (emp) => emp.employeeId == employeeId
-          );
 
           if (role == "Programmer" && !assigned) {
             return (
