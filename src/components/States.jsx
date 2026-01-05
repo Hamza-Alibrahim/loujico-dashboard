@@ -31,7 +31,7 @@ const States = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Location/GetAllState`, {
+          .get(`http://212.85.25.41:7176/Location/GetAllState`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

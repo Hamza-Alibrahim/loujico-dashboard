@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220.42 211.62">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke-width: 0px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #fbb062;
+      }
+
+      .cls-2 {
+        font-family: SegoeUIVariable, 'Segoe UI Variable';
+        font-size: 4.62px;
+        font-variation-settings: 'wght' 400, 'opsz' 10;
+      }
+    </style>
+  </defs>
+  <polygon class="cls-1" points="100.34 197.05 110.7 209.31 135.55 209.24 127.33 197.05 100.34 197.05"/>
+  <g>
+    <polygon class="cls-1" points="199.18 153.36 204.75 139.06 97.24 0 92.06 14.8 199.18 153.36"/>
+    <polygon class="cls-1" points="189.59 173.68 195.15 159.38 87.64 20.32 82.46 35.12 189.59 173.68"/>
+    <polygon class="cls-1" points="180.59 193.5 186.16 179.19 78.65 40.13 73.46 54.93 180.59 193.5"/>
+    <polygon class="cls-1" points="172.21 211.62 178.09 197.72 123.18 126.69 119.54 143.49 172.21 211.62"/>
+    <polygon class="cls-1" points="140.76 195.86 143.89 179.96 117.93 146.38 113.86 162.62 140.76 195.86"/>
+    <polygon class="cls-1" points="101.78 210.1 89.78 197.05 0 197.81 11.17 210.87 101.78 210.1"/>
+    <polygon class="cls-1" points="32.33 181.49 44.32 194.55 134.1 193.87 122.93 180.8 32.33 181.49"/>
+    <polygon class="cls-1" points="66.11 165.04 79.16 178.09 121.61 177.77 111.15 164.7 66.11 165.04"/>
+  </g>
+  <text class="cls-2" transform="translate(215.9 140.48)"><tspan x="0" y="0">R</tspan></text>
+  <path class="cls-1" d="m217.3,142.12c-1.72,0-3.12-1.4-3.12-3.12s1.4-3.12,3.12-3.12,3.12,1.4,3.12,3.12-1.4,3.12-3.12,3.12m0-5.93c-1.55,0-2.81,1.26-2.81,2.81s1.26,2.81,2.81,2.81,2.81-1.26,2.81-2.81-1.26-2.81-2.81-2.81"/>
+</svg>

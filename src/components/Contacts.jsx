@@ -31,7 +31,7 @@ const Contacts = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Settings/GetAllContactType`, {
+          .get(`http://212.85.25.41:7176/Settings/GetAllContactType`, {
             //timeout: 5000,
             headers: {
               Authorization: `Bearer ${token}`,

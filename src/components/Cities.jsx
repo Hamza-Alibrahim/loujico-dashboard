@@ -31,7 +31,7 @@ const Cities = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Location/GetAllCity`, {
+          .get(`http://212.85.25.41:7176/Location/GetAllCity`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

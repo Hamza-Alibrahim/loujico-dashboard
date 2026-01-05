@@ -97,7 +97,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/${type}/GetById/${id}`, {
+          .get(`http://212.85.25.41:7176/${type}/GetById/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -138,7 +138,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       try {
         setLoadingTasks(true);
         const response = await axios.get(
-          `http://loujico.somee.com/Api/Task/GetAll?projectId=${id}&page=${tasksPage}&pageSize=${tasksPageSize}&myTasks=${myTasksOnly}&status=${statusFilter}&search=${debouncedSearchQuery}`,
+          `http://212.85.25.41:7176/Task/GetAll?projectId=${id}&page=${tasksPage}&pageSize=${tasksPageSize}&myTasks=${myTasksOnly}&status=${statusFilter}&search=${debouncedSearchQuery}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -204,7 +204,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     }
     try {
       const response = await axios
-        .get(`http://loujico.somee.com/Api/Task/GetById/${id}`, {
+        .get(`http://212.85.25.41:7176/Task/GetById/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -242,7 +242,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
     try {
       const response = await axios
         .patch(
-          `http://loujico.somee.com/Api/Task/EditTaskStatus/${id}?Status=${status}`,
+          `http://212.85.25.41:7176/Task/EditTaskStatus/${id}?Status=${status}`,
           null,
           {
             headers: {
@@ -306,7 +306,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Company/AddContacts/${id}`,
+        `http://212.85.25.41:7176/Company/AddContacts/${id}`,
         body.contacts,
         {
           headers: {
@@ -351,7 +351,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Task/Add`,
+        `http://212.85.25.41:7176/Task/Add`,
         body,
         {
           headers: {
@@ -384,7 +384,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Company/AddEmployees/${id}`,
+        `http://212.85.25.41:7176/Company/AddEmployees/${id}`,
         [body],
         {
           headers: {
@@ -417,7 +417,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body.activities);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Company/AddActivities/${id}`,
+        `http://212.85.25.41:7176/Company/AddActivities/${id}`,
         body.activities,
         {
           headers: {
@@ -450,7 +450,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body.addresses);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Company/AddAddresses/${id}`,
+        `http://212.85.25.41:7176/Company/AddAddresses/${id}`,
         body.addresses,
         {
           headers: {
@@ -483,7 +483,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(body.company);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Product/AddCompany/${id}`,
+        `http://212.85.25.41:7176/Product/AddCompany/${id}`,
         body.company,
         {
           headers: {
@@ -585,7 +585,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       const data = convertToFormData(body);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Company/AddFiles/${id}`,
+        `http://212.85.25.41:7176/Company/AddFiles/${id}`,
         data,
         {
           headers: {
@@ -619,7 +619,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       const data = convertToFormData(body);
 
       const response = await axios.post(
-        `http://loujico.somee.com/Api/Task/AddFile?id=${taskDetails.id}`,
+        `http://212.85.25.41:7176/Task/AddFile?id=${taskDetails.id}`,
         data,
         {
           headers: {
@@ -661,7 +661,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
         }));
 
       const response = await axios.patch(
-        `http://loujico.somee.com/Api/Company/EditContacts/${id}`,
+        `http://212.85.25.41:7176/Company/EditContacts/${id}`,
         updatedContacts,
         {
           headers: {
@@ -693,7 +693,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.delete(
-        `http://loujico.somee.com/Api/Task/Delete/${taskId}`,
+        `http://212.85.25.41:7176/Task/Delete/${taskId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -742,7 +742,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       const data = convertToFormData(body);
 
       const response = await axios.patch(
-        `http://loujico.somee.com/Api/Task/Edit?id=${body.id}`,
+        `http://212.85.25.41:7176/Task/Edit?id=${body.id}`,
         data,
         {
           headers: {
@@ -783,7 +783,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
         const formData = convertToFormData(newdata);
         const response = await axios.patch(
-          `http://loujico.somee.com/Api/${type}/Edit`,
+          `http://212.85.25.41:7176/${type}/Edit`,
           formData,
           {
             headers: {
@@ -799,7 +799,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
           (emp) => emp.id !== employeeId
         );
         const response = await axios.patch(
-          `http://loujico.somee.com/Api/Company/EditEmployees/${id}`,
+          `http://212.85.25.41:7176/Company/EditEmployees/${id}`,
           updatedEmployees,
           {
             headers: {
@@ -838,7 +838,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(updatedActivities);
 
       const response = await axios.patch(
-        `http://loujico.somee.com/Api/Company/EditActivities/${id}`,
+        `http://212.85.25.41:7176/Company/EditActivities/${id}`,
         updatedActivities,
         {
           headers: {
@@ -876,7 +876,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
       console.log(updatedaddresses);
 
       const response = await axios.patch(
-        `http://loujico.somee.com/Api/Company/Editaddresses/${id}`,
+        `http://212.85.25.41:7176/Company/Editaddresses/${id}`,
         updatedaddresses,
         {
           headers: {
@@ -910,7 +910,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.delete(
-        `http://loujico.somee.com/Api/${
+        `http://212.85.25.41:7176/${
           forTask ? "Task" : type
         }/DeleteFile/${fileId}`,
         {
@@ -947,7 +947,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
 
     try {
       const response = await axios.delete(
-        `http://loujico.somee.com/Api/Product/DeleteCompany/${id}?companyId=${companyId}`,
+        `http://212.85.25.41:7176/Product/DeleteCompany/${id}?companyId=${companyId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -1313,7 +1313,7 @@ const DetailView = ({ id, fallBack, name, type, onClose, canAdd = false }) => {
                                   {fileIcon}
                                 </span>
                                 <a
-                                  href={`http://loujico.somee.com/Api/upload/${
+                                  href={`http://212.85.25.41:7176/upload/${
                                     type === "Emp" ? "Employee" : type
                                   }s/${file.fileName}`}
                                   target="_blank"

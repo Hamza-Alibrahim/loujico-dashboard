@@ -288,7 +288,7 @@ const SideBar = ({ isOpen, onClose }) => {
     >
       <div className={`flex items-center w-full pt-10 lg:hidden gap-2 px-5`}>
         <img
-          src="/public/assets/image/logo.png"
+          src="/assets/image/logo.png"
           alt={t("logoAlt")}
           className="w-[150px] mt-2 flex-1"
         />

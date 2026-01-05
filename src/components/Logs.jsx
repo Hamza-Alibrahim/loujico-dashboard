@@ -34,7 +34,7 @@ const Logs = () => {
         if (search) {
           const response = await axios
             .get(
-              `http://loujico.somee.com/Api/Logs/Search?page=${page}&count=${count}&name=${search}`,
+              `http://212.85.25.41:7176/Logs/Search?page=${page}&count=${count}&name=${search}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -49,7 +49,7 @@ const Logs = () => {
         } else {
           const response = await axios
             .get(
-              `http://loujico.somee.com/Api/Logs/GetAll?page=${page}&count=${count}`,
+              `http://212.85.25.41:7176/Logs/GetAll?page=${page}&count=${count}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -82,7 +82,7 @@ const Logs = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Logs/GetCount`, {
+          .get(`http://212.85.25.41:7176/Logs/GetCount`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

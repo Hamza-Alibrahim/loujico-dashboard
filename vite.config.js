@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://loujico.somee.com/Api", // استبدل هذا بعنوان خادم API الخاص بك
+        target: "http://212.85.25.41:7176", // استبدل هذا بعنوان خادم API الخاص بك
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, ""), // (اختياري) لإزالة "/api" من المسار

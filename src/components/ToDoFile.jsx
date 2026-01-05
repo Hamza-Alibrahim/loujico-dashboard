@@ -58,15 +58,12 @@ const ToDoFile = ({
         return;
       }
 
-      await axios.delete(
-        `http://loujico.somee.com/Api${url}/DeleteFile/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.delete(`http://212.85.25.41:7176${url}/DeleteFile/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
     } catch (err) {
       console.error(err);
     }

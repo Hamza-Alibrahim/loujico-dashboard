@@ -27,7 +27,7 @@ const History = ({ url, id }) => {
 
         const response = await axios
           .get(
-            `http://loujico.somee.com/Api/${url}/EditHistory?page=${1}&count=${10}&id=${id}`,
+            `http://212.85.25.41:7176/${url}/EditHistory?page=${1}&count=${10}&id=${id}`,
             {
               //timeout: 5000,
               headers: {

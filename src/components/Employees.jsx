@@ -35,7 +35,7 @@ const Employees = () => {
         if (search) {
           const response = await axios
             .get(
-              `http://loujico.somee.com/Api/Emp/Search?page=${page}&count=${count}&name=${search}`,
+              `http://212.85.25.41:7176/Emp/Search?page=${page}&count=${count}&name=${search}`,
               {
                 // //timeout: 5000,
                 headers: {
@@ -50,7 +50,7 @@ const Employees = () => {
         } else {
           const response = await axios
             .get(
-              `http://loujico.somee.com/Api/Emp/GetAll?page=${page}&count=${count}`,
+              `http://212.85.25.41:7176/Emp/GetAll?page=${page}&count=${count}`,
               {
                 //timeout: 5000,
                 headers: {
@@ -85,7 +85,7 @@ const Employees = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Emp/GetCount`, {
+          .get(`http://212.85.25.41:7176/Emp/GetCount`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",

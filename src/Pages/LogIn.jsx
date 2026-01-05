@@ -32,7 +32,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://loujico.somee.com/Api/Account/Login",
+        "http://212.85.25.41:7176/Account/Login",
         {
           Email,
           Password,
@@ -70,7 +70,7 @@ const Login = () => {
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
         <div className="text-center">
           <img
-            src="/public/assets/image/logo.png"
+            src="/assets/image/logo.png"
             alt="Company Logo"
             className="mx-auto h-24 w-auto mb-4"
           />

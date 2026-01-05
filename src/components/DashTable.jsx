@@ -8,7 +8,7 @@ import { FaSearch } from "react-icons/fa";
 import { AuthContext } from "../Context/AuthContext";
 
 // API base URL should be configured globally, not hardcoded
-const API_BASE_URL = "http://loujico.somee.com/Api";
+const API_BASE_URL = "http://212.85.25.41:7176";
 
 const DashTable = ({
   title,

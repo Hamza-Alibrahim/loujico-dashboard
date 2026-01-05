@@ -31,7 +31,7 @@ const Activities = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Settings/GetAllActivityType`, {
+          .get(`http://212.85.25.41:7176/Settings/GetAllActivityType`, {
             //timeout: 5000,
             headers: {
               Authorization: `Bearer ${token}`,

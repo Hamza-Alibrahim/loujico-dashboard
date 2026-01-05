@@ -8,7 +8,7 @@ export const employeeFields = [
     name: "userId",
     title: "popupFields.employee.userId",
     type: "select",
-    api: "http://loujico.somee.com/Api/Account/UserListId"
+    api: "http://212.85.25.41:7176/Account/UserListId"
   },
   {
     name: "firstName",
@@ -317,7 +317,7 @@ export const companyFields = [
     name: "legalId",
     title: "fields.companyContactFields.legal.id",
     type: "select",
-    api: "http://loujico.somee.com/Api/Settings/GetAllLegalType",
+    api: "http://212.85.25.41:7176/Settings/GetAllLegalType",
   },
   // company: companyDetailFields,
   // addresses: companyAddressesFields,
@@ -337,7 +337,7 @@ export const projectFields = [
     name: "companyId",
     title: "popupFields.project.companyId",
     type: "select",
-    api: "http://loujico.somee.com/Api/Company/GetAllId",
+    api: "http://212.85.25.41:7176/Company/GetAllId",
   },
   {
     name: "title",
@@ -457,13 +457,13 @@ export const invoiceFields = [
     name: "clientId",
     title: "popupFields.invoice.clientId",
     type: "select",
-    api: "http://loujico.somee.com/Api/Customer/GetAllId",
+    api: "http://212.85.25.41:7176/Customer/GetAllId",
   },
   {
     name: "projectId",
     title: "popupFields.invoice.projectId",
     type: "select",
-    api: "http://loujico.somee.com/Api/Project/GetAllId",
+    api: "http://212.85.25.41:7176/Project/GetAllId",
   },
   {
     name: "amount",
@@ -573,7 +573,7 @@ export const activityFields = [
     name: "IndustryId",
     title: "fields.activity.industryName",
     type: "select",
-    api: "http://loujico.somee.com/Api/Settings/GetAllIndustryType",
+    api: "http://212.85.25.41:7176/Settings/GetAllIndustryType",
     required: true,
   },
 ];
@@ -708,7 +708,7 @@ export const stateFields = [
     name: "id",
     title: "fields.state.countryId",
     type: "select",
-    api: "http://loujico.somee.com/Api/Location/GetAllCountry",
+    api: "http://212.85.25.41:7176/Location/GetAllCountry",
     required: true,
   },
   {
@@ -724,7 +724,7 @@ export const cityFields = [
     name: "id",
     title: "fields.city.stateId",
     type: "select",
-    api: "http://loujico.somee.com/Api/Location/GetAllState",
+    api: "http://212.85.25.41:7176/Location/GetAllState",
     required: true,
   },
   {

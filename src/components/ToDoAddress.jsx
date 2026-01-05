@@ -36,7 +36,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
         }
 
         const response = await axios
-          .get("http://loujico.somee.com/Api/Location/GetAllCountry", {
+          .get("http://212.85.25.41:7176/Location/GetAllCountry", {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
@@ -73,7 +73,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
 
         const response = await axios
           .get(
-            `http://loujico.somee.com/Api/Location/GetStateByCountry/${selectedCountry}`,
+            `http://212.85.25.41:7176/Location/GetStateByCountry/${selectedCountry}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ const ToDoAddress = ({ formData, setFormData }) => {
 
         const response = await axios
           .get(
-            `http://loujico.somee.com/Api/Location/GetCityByState/${selectedState}`,
+            `http://212.85.25.41:7176/Location/GetCityByState/${selectedState}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

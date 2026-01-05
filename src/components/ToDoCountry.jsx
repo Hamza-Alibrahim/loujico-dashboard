@@ -26,7 +26,7 @@ const ToDoCountry = ({ formData, setFormData }) => {
         if (!token) return;
 
         const response = await axios.get(
-          "http://loujico.somee.com/Api/Settings/GetAllContactType",
+          "http://212.85.25.41:7176/Settings/GetAllContactType",
           {
             headers: {
               Authorization: `Bearer ${token}`,

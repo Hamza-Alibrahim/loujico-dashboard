@@ -33,7 +33,7 @@ const Companies = () => {
         }
         if (search) {
           const response = await axios.get(
-            `http://loujico.somee.com/Api/Company/Search?page=${page}&count=${count}&name=${search}`,
+            `http://212.85.25.41:7176/Company/Search?page=${page}&count=${count}&name=${search}`,
             {
               //timeout: 5000,
               headers: {
@@ -46,7 +46,7 @@ const Companies = () => {
           setCompanies(response.data.data || response.data);
         } else {
           const response = await axios.get(
-            `http://loujico.somee.com/Api/Company/GetAll?page=${page}&count=${count}`,
+            `http://212.85.25.41:7176/Company/GetAll?page=${page}&count=${count}`,
             {
               //timeout: 5000,
               headers: {
@@ -78,7 +78,7 @@ const Companies = () => {
         }
 
         const response = await axios
-          .get(`http://loujico.somee.com/Api/Company/GetCount`, {
+          .get(`http://212.85.25.41:7176/Company/GetCount`, {
             headers: {
               Authorization: `Bearer ${token}`,
               "Content-Type": "application/json",
